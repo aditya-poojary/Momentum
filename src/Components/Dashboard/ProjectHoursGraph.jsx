@@ -1,24 +1,63 @@
-export default function ProjectHoursGraph () {
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Total project hours</h2>
-        <div className="h-48 grid grid-cols-14 gap-2">
-          {/* Graph bars would be dynamically generated based on data */}
-          {Array(14).fill(null).map((_, i) => (
-            <div key={i} className="flex flex-col justify-end">
-              <div 
-                className="bg-blue-100 rounded-t"
-                style={{ height: `${Math.random() * 100}%` }}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-14 gap-2 mt-2 text-xs text-gray-500">
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-            <div key={day} className="text-center">{day}</div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-  
+import React, { useEffect, useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { getDocs, collection, query, orderBy, limit } from "firebase/firestore";
+import { db, app } from "../../Backend";
+import { getAuth } from "firebase/auth";
+
+export default function ProjectHoursGraph() {
+  const [userEmail, setUserEmail] = useState("");
+  const [graphData, setGraphData] = useState([]);
+
+  // Fetch current user email
+  useEffect(() => {
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+    if (user) {
+      setUserEmail(user.email);
+    }
+  }, []);
+
+  // Fetch the latest 7 documents from the DailyProgress collection
+  const fetchDailyProgress = async () => {
+    if (!userEmail) return;
+
+    try {
+      const progressRef = collection(db, "users", userEmail, "DailyProgress");
+      const q = query(progressRef, orderBy("date", "desc"), limit(7)); // Query for the latest 7 documents
+      const snapshot = await getDocs(q);
+
+      const data = snapshot.docs
+        .map((doc) => ({
+          date: doc.id, // Assuming the document ID is the date
+          totalProgress: doc.data().totalProgress || 0,
+        }))
+        .reverse(); // Reverse to show oldest first for proper graph order
+
+      setGraphData(data);
+    } catch (error) {
+      console.error("Error fetching daily progress:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDailyProgress();
+  }, [userEmail]);
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Weekly Progress</h2>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
+          <Tooltip />
+          <Bar dataKey="totalProgress" fill="#4a90e2" radius={[10, 10, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+      <p className="text-sm text-gray-500 text-center mt-4">
+        Visualizing your progress for the past 7 days.
+      </p>
+    </div>
+  );
+}
