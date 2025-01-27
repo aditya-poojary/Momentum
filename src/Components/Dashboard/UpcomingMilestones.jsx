@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../Backend";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 
 export default function UpcomingMilestones() {
   const [projects, setProjects] = useState([]);
@@ -21,7 +27,11 @@ export default function UpcomingMilestones() {
         const endDate = datesInWeek[6].toISOString().split("T")[0]; // End of the week
 
         const projectsRef = collection(db, "projects");
-        const q = query(projectsRef, where("deadline", ">=", startDate), where("deadline", "<=", endDate));
+        const q = query(
+          projectsRef,
+          where("deadline", ">=", startDate),
+          where("deadline", "<=", endDate)
+        );
         const querySnapshot = await getDocs(q);
 
         const fetchedProjects = querySnapshot.docs.map((doc) => ({
@@ -49,17 +59,29 @@ export default function UpcomingMilestones() {
       <div className="grid grid-cols-7 gap-4 mb-8">
         {datesInWeek.map((date, i) => {
           const formattedDate = date.toISOString().split("T")[0];
-          const projectsOnDate = projects.filter((project) => project.deadline === formattedDate);
-          const allCompleted = projectsOnDate.every((project) => project.completed);
+          const projectsOnDate = projects.filter(
+            (project) => project.deadline === formattedDate
+          );
+          const allCompleted = projectsOnDate.every(
+            (project) => project.completed
+          );
 
           return (
             <div
               key={i}
               className={`text-center p-2 rounded-lg border ${
-                date.toDateString() === new Date().toDateString() ? "bg-blue-100" : ""
-              } ${allCompleted ? "border-green-500 text-green-600" : "border-red-500 text-red-600"}`}
+                date.toDateString() === new Date().toDateString()
+                  ? "bg-blue-100"
+                  : ""
+              } ${
+                allCompleted
+                  ? "border-green-500 text-green-600"
+                  : "border-red-500 text-red-600"
+              }`}
             >
-              <div className="text-sm font-medium">{date.toDateString().slice(0, 3)}</div>
+              <div className="text-sm font-medium">
+                {date.toDateString().slice(0, 3)}
+              </div>
               <div className="text-lg font-bold">{date.getDate()}</div>
             </div>
           );
@@ -72,7 +94,9 @@ export default function UpcomingMilestones() {
           <div key={project.id} className="flex gap-4 items-center">
             <div
               className={`w-8 h-8 flex items-center justify-center rounded-lg font-bold ${
-                project.completed ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                project.completed
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
               }`}
             >
               {new Date(project.deadline).getDate()}
@@ -88,4 +112,3 @@ export default function UpcomingMilestones() {
     </div>
   );
 }
-

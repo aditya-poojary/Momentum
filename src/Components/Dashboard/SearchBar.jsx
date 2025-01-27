@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // For navigation
 import { getDocs, collection, doc } from "firebase/firestore"; // Firebase Firestore
-import { db, app } from "../../Backend";
+import { db, app } from "../../firebase";
 import { getAuth } from "firebase/auth";
 
 export default function SearchBar() {

@@ -6,7 +6,7 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { db, app } from "../../Backend";
+import { db, app } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,7 +22,11 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Calendar as CalendarIcon, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 export default function CalendarOverview() {
   const [projects, setProjects] = useState([]);

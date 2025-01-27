@@ -11,7 +11,7 @@ import {
 } from "react-router-dom"; // Import BrowserRouter
 import { Provider, useDispatch } from "react-redux";
 import store from "./store/store.js";
-import { app } from "./Backend.js";
+import { app } from "./firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { createOrFetchUserDocument } from "./Firestore/UserDocument.js"; // Adjust the path
 
@@ -32,6 +32,7 @@ import Logout from "./Components/Logout/Logout.jsx"; // Import the React compone
 import MyProjects from "./Components/MyProjects/MyProjects.jsx";
 import TrashBin from "./Components/TrashBin/TrashBin.jsx";
 import MyProjectsnew from "./Pages/MyProjectsnew.jsx";
+import SuccessProject from "./Components/SuccessProject/SuccessProject.jsx";
 
 const auth = getAuth(app);
 
@@ -83,6 +84,7 @@ const router = createBrowserRouter(
       <Route path = "/MyProjects" element={<MyProjects/>}/>
       <Route path = "/TrashBin" element={<TrashBin/>}/>
       <Route path="/Logout" element={<Logout />} />
+      <Route path="/successful-projects" element={<SuccessProject/>} />
     </Route>
   )
 );

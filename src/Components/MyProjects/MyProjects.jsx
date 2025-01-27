@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { getDocs, collection, doc, updateDoc, addDoc, setDoc} from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  doc,
+  updateDoc,
+  addDoc,
+  setDoc,
+} from "firebase/firestore";
 import { moveToTrashBin } from "../../Firestore/UserDocument";
-import { db, app } from "../../Backend";
-import { getAuth } from "firebase/auth";
+import { db, app } from "../../firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 
 export default function MyProjects() {
   const [userEmail, setUserEmail] = useState("");
@@ -12,57 +20,71 @@ export default function MyProjects() {
   const [filter, setFilter] = useState("All");
   const [editProject, setEditProject] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const [previousCompletionValues, setPreviousCompletionValues] = useState({});
+  const [isauthenticated, setisauthenticated] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const auth = getAuth(app);
-    const user = auth.currentUser;
-    if (user) {
-      setUserEmail(user.email);
-    }
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setisauthenticated(true);
+        setUserEmail(user.email);
+      } else {
+        setisauthenticated(false);
+        navigate("/SignIn");
+      }
+      setIsInitializing(false);
+    });
 
-  const fetchProjects = async () => {
-    if (!userEmail) return;
+    return () => unsubscribe();
+  }, [navigate]);
 
-    try {
-      const projectsRef = collection(db, "users", userEmail, "Projects");
-      const snapshot = await getDocs(projectsRef);
-
-      const projectsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setProjects(projectsData);
-      setFilteredProjects(projectsData); // Initialize filtered projects
-
-      // Save initial completion values to track changes later
-      const initialCompletionValues = {};
-      projectsData.forEach((project) => {
-        initialCompletionValues[project.id] = project.completion || 0;
-      });
-      setPreviousCompletionValues(initialCompletionValues);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
-
+  // Fetch projects
   useEffect(() => {
+    const fetchProjects = async () => {
+      if (!userEmail) return;
+
+      try {
+        const projectsRef = collection(db, "users", userEmail, "Projects");
+        const snapshot = await getDocs(projectsRef);
+
+        const projectsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setProjects(projectsData);
+        setFilteredProjects(projectsData);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
     fetchProjects();
   }, [userEmail]);
 
+  // Filter projects
   useEffect(() => {
     if (filter === "All") {
       setFilteredProjects(projects);
     } else {
       const filtered = projects.filter(
-        (project) => project.category.toLowerCase() === filter.toLowerCase()
+        (project) => project.category?.toLowerCase() === filter.toLowerCase()
       );
       setFilteredProjects(filtered);
     }
   }, [filter, projects]);
+
+  // Prevent rendering until initialization is complete
+  if (isInitializing) {
+    return <div>Loading...</div>;
+  }
+
+  // Prevent rendering if not authenticated
+  if (!isauthenticated) {
+    return null;
+  }
 
   const handleEditClick = (project) => {
     setEditProject(project);
@@ -74,97 +96,59 @@ export default function MyProjects() {
     setIsDialogOpen(false);
   };
 
-  const logDailyProgress = async (change) => {
-    try {
-      const today = new Date().toISOString().split("T")[0]; // Get the current date in YYYY-MM-DD format
-      const progressRef = collection(db, "users", userEmail, "DailyProgress");
-      const docRef = doc(progressRef, today);
-  
-      // Check if a document for today exists
-      const docSnapshot = await getDocs(progressRef);
-  
-      const existingDoc = docSnapshot.docs.find((doc) => doc.id === today);
-  
-      if (existingDoc) {
-        // Update the existing document for today
-        const updatedProgress =
-          (existingDoc.data().totalProgress || 0) + change;
-  
-        // Ensure totalProgress doesn't go below 0
-        const validProgress = Math.max(0, updatedProgress);
-  
-        await updateDoc(docRef, {
-          totalProgress: validProgress,
-        });
-      } else {
-        // Create a new document for today
-        await setDoc(docRef, {
-          totalProgress: Math.max(0, change), // Ensure valid initial progress
-          date: today,
-        });
-      }
-    } catch (error) {
-      console.error("Error logging daily progress:", error);
-    }
-  };
-  
   const handleUpdateProject = async () => {
     if (!editProject) return;
   
     try {
-      const projectRef = doc(
-        db,
-        "users",
-        userEmail,
-        "Projects",
-        editProject.id
-      );
+      // Parse fields back to their correct types
+      const updatedProject = {
+        ...editProject,
+        completion: parseFloat(editProject.completion), // Ensure it's a number
+        deadline: editProject.deadline ? new Date(editProject.deadline).toISOString().split("T")[0] : null, // Ensure it's a valid date
+        startTime: editProject.startTime ? new Date(editProject.startTime).toISOString() : null, // Ensure it's a valid timestamp
+      };
   
-      // Calculate the change in completion
-      const previousCompletion =
-        previousCompletionValues[editProject.id] || editProject.completion || 0;
-      const changeInCompletion = editProject.completion - previousCompletion;
+      const projectRef = doc(db, "users", userEmail, "Projects", editProject.id);
   
-      // Log both positive and negative progress
-      if (changeInCompletion !== 0) {
-        await logDailyProgress(changeInCompletion);
-      }
+      // Update Firestore
+      await updateDoc(projectRef, updatedProject);
   
-      // Update the project in Firestore
-      await updateDoc(projectRef, editProject);
-  
-      // Update the projects in state
+      // Update state
       setProjects((prev) =>
         prev.map((proj) =>
-          proj.id === editProject.id ? { ...proj, ...editProject } : proj
+          proj.id === editProject.id ? { ...proj, ...updatedProject } : proj
         )
       );
   
       setFilteredProjects((prev) =>
         prev.map((proj) =>
-          proj.id === editProject.id ? { ...proj, ...editProject } : proj
+          proj.id === editProject.id ? { ...proj, ...updatedProject } : proj
         )
       );
   
-      // Update the previousCompletionValues to reflect the latest data
-      setPreviousCompletionValues((prev) => ({
-        ...prev,
-        [editProject.id]: editProject.completion,
-      }));
-  
+      // Close the dialog
       handleDialogClose();
     } catch (error) {
       console.error("Error updating project:", error);
     }
   };
   
-  
-
-  
-
   const handleMoveToTrashBin = async (project) => {
     await moveToTrashBin(userEmail, project, async () => {
-      // Fetch updated projects after successful deletion
+      const fetchProjects = async () => {
+        try {
+          const projectsRef = collection(db, "users", userEmail, "Projects");
+          const snapshot = await getDocs(projectsRef);
+          const projectsData = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setProjects(projectsData);
+          setFilteredProjects(projectsData);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        }
+      };
       await fetchProjects();
     });
   };
@@ -282,84 +266,88 @@ export default function MyProjects() {
       </div>
 
       {isDialogOpen && editProject && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <h2 className="text-xl font-bold mb-4">Edit Project</h2>
-            <div className="flex flex-col gap-4">
-              <input
-                type="text"
-                className="border p-2 rounded"
-                value={editProject.projectName}
-                onChange={(e) =>
-                  setEditProject((prev) => ({
-                    ...prev,
-                    projectName: e.target.value,
-                  }))
-                }
-              />
-              <input
-                type="text"
-                className="border p-2 rounded"
-                value={editProject.description}
-                onChange={(e) =>
-                  setEditProject((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-              />
-              <input
-                type="number"
-                className="border p-2 rounded"
-                value={editProject.completion}
-                onChange={(e) =>
-                  setEditProject((prev) => ({
-                    ...prev,
-                    completion: e.target.value,
-                  }))
-                }
-              />
-              <input
-                type="date"
-                className="border p-2 rounded"
-                value={editProject.deadline}
-                onChange={(e) =>
-                  setEditProject((prev) => ({
-                    ...prev,
-                    deadline: e.target.value,
-                  }))
-                }
-              />
-              <input
-                type="datetime-local"
-                className="border p-2 rounded"
-                value={editProject.startTime}
-                onChange={(e) =>
-                  setEditProject((prev) => ({
-                    ...prev,
-                    startTime: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={handleUpdateProject}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Save
-              </button>
-              <button
-                onClick={handleDialogClose}
-                className="bg-gray-300 px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      <Button>cfgvhbjnkml,</Button>
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+      <h2 className="text-xl font-bold mb-4 text-gray-800">Edit Project</h2>
+      <div className="flex flex-col gap-4">
+        <input
+          type="text"
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
+          value={editProject.projectName}
+          onChange={(e) =>
+            setEditProject((prev) => ({
+              ...prev,
+              projectName: e.target.value,
+            }))
+          }
+          placeholder="Project Name"
+        />
+        <textarea
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
+          value={editProject.description}
+          onChange={(e) =>
+            setEditProject((prev) => ({
+              ...prev,
+              description: e.target.value,
+            }))
+          }
+          placeholder="Description"
+        />
+        <input
+          type="number"
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
+          value={editProject.completion}
+          onChange={(e) =>
+            setEditProject((prev) => ({
+              ...prev,
+              completion: e.target.value, // Allow only numeric input
+            }))
+          }
+          placeholder="Completion Percentage"
+        />
+        <input
+          type="date"
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
+          value={editProject.deadline}
+          onChange={(e) =>
+            setEditProject((prev) => ({
+              ...prev,
+              deadline: e.target.value,
+            }))
+          }
+          placeholder="Deadline"
+        />
+        <input
+          type="datetime-local"
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
+          value={editProject.startTime}
+          onChange={(e) =>
+            setEditProject((prev) => ({
+              ...prev,
+              startTime: e.target.value,
+            }))
+          }
+          placeholder="Start Time"
+        />
+      </div>
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={handleUpdateProject}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Save
+        </button>
+        <button
+          onClick={handleDialogClose}
+          className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

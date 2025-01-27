@@ -2,17 +2,22 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setEditProject, setDialogOpen } from "../../store/projectsSlice";
 import { updateDoc, doc } from "firebase/firestore";
-import { db } from "../../Backend";
+import { db } from "../../firebase";
 
-
-export default function EditProjectDialog  ({ userEmail }) {
+export default function EditProjectDialog({ userEmail }) {
   const editProject = useSelector((state) => state.projects.editProject);
   const dispatch = useDispatch();
 
   const handleUpdateProject = async () => {
     if (!editProject) return;
     try {
-      const projectRef = doc(db, "users", userEmail, "Projects", editProject.id);
+      const projectRef = doc(
+        db,
+        "users",
+        userEmail,
+        "Projects",
+        editProject.id
+      );
       await updateDoc(projectRef, editProject);
       dispatch(setDialogOpen(false));
     } catch (error) {
@@ -27,7 +32,11 @@ export default function EditProjectDialog  ({ userEmail }) {
         <input
           type="text"
           value={editProject.projectName}
-          onChange={(e) => dispatch(setEditProject({ ...editProject, projectName: e.target.value }))}
+          onChange={(e) =>
+            dispatch(
+              setEditProject({ ...editProject, projectName: e.target.value })
+            )
+          }
         />
         {/* Additional inputs */}
         <button onClick={handleUpdateProject}>Save</button>
@@ -35,5 +44,4 @@ export default function EditProjectDialog  ({ userEmail }) {
       </div>
     </div>
   ) : null;
-};
-
+}

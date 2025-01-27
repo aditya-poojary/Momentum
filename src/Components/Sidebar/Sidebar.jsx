@@ -5,7 +5,7 @@ function Sidebar() {
   const navigate = useNavigate();
 
   return (
-    <div className="w-20 min-h-screen bg-[#152d46] flex flex-col items-center py-4 space-y-8 mt-[70px]">
+    <div className="w-20 min-h-screen bg-[#152d46] items-center py-4 space-y-8 mt-[70px]">
       <button onClick={() => navigate("/CreateProject")} className="w-16 h-16">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" className="w-full h-full">
           <rect x="40" y="40" width="160" height="160" rx="20" ry="20" fill="#4CAF50" stroke="#45a049" strokeWidth="4" />

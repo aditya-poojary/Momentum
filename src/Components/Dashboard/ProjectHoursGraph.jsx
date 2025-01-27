@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { getDocs, collection, query, orderBy, limit } from "firebase/firestore";
-import { db, app } from "../../Backend";
+import { db, app } from "../../firebase";
 import { getAuth } from "firebase/auth";
 
 export default function ProjectHoursGraph() {
@@ -45,9 +53,14 @@ export default function ProjectHoursGraph() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Weekly Progress</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+        Weekly Progress
+      </h2>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={graphData} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
+        <BarChart
+          data={graphData}
+          margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
           <YAxis tick={{ fontSize: 12 }} />

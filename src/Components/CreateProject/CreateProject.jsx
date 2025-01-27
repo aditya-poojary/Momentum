@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase, ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
-import { app } from "../../Backend";
+import { app } from "../../firebase";
 import { addProjectToUserCollection } from "../../Firestore/UserDocument";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DialogBox from "./DialogBox/DialogBox";
-
 
 const db = getDatabase(app);
 function CreateProject() {
@@ -20,8 +19,6 @@ function CreateProject() {
   const navigate = useNavigate();
 
   const handleCloseDialog = () => setShowDialog(false);
-
-
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -49,12 +46,11 @@ function CreateProject() {
         setShowDialog(true); // Show dialog box if project is duplicate
       } else {
         console.log("Project created successfully!");
-        navigate('/Dashboard');
-         // Navigate after successful creation
+        navigate("/Dashboard");
+        // Navigate after successful creation
       }
     } catch (error) {
       console.error("Error creating project:", error);
-      
     }
   };
   return (
@@ -162,14 +158,12 @@ function CreateProject() {
           </button>
         </form>
       </div>
-        <DialogBox
+      <DialogBox
         show={showDialog}
-        
         title="Duplicate Project"
         message="A project with this name already exists. Please use a different name."
-        
         onClose={handleCloseDialog}
-        />
+      />
     </div>
   );
 }

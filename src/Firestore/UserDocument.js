@@ -1,5 +1,14 @@
-import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc,Timestamp} from "firebase/firestore";
-import { db } from "../Backend";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "../firebase";
 
 /**
  * Create or fetch a user document in the Firestore database.
@@ -62,7 +71,6 @@ export const addProjectToUserCollection = async (email, projectData) => {
     console.error("Error adding project to Projects collection:", error);
   }
 };
-
 
 export const handleDeleteProject = async (project) => {
   try {
@@ -178,7 +186,9 @@ export const restoreProjectToProjects = async (email, projectId) => {
       // Write the restored project data to the Projects collection
       await setDoc(projectsRef, restoredProjectData);
 
-      console.log(`Project ${projectId} successfully restored to Projects collection.`);
+      console.log(
+        `Project ${projectId} successfully restored to Projects collection.`
+      );
     } else {
       throw new Error("Project not found in TrashBin.");
     }
@@ -225,3 +235,12 @@ export const restoreAndCleanupProject = async (email, projectId) => {
     console.error("Error during restore and cleanup process:", error);
   }
 };
+
+export async function saveContactForm(data) {
+  try {
+    const docRef = await addDoc(collection(db, "ContactUs"), data);
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}

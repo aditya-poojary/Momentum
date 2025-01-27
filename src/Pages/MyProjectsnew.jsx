@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setProjects } from "../store/projectsSlice";
 import { getDocs, collection } from "firebase/firestore";
-import { db, app } from "../Backend.js";
+import { db, app } from "../firebase.js";
 import ProjectFilter from "../Components/MyProjects/ProjectFilter";
 import ProjectTable from "../Components/MyProjects/ProjectTable";
 import EditProjectDialog from "../Components/MyProjects/EditDialog";

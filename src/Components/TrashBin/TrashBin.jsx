@@ -1,12 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, doc, deleteDoc, setDoc } from "firebase/firestore";
-import { db } from "../../Backend";
-import { getAuth } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../../firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { restoreAndCleanupProject } from "../../Firestore/UserDocument";
+import { useNavigate } from "react-router-dom";
 
 function TrashBin() {
   const [userEmail, setUserEmail] = useState("");
   const [trashProjects, setTrashProjects] = useState([]);
+  const [isAuthenticated,setisauthenticated] =useState(false);
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user)=>{
+      if(user){
+        setisauthenticated(true);
+      }else{
+        navigate("/SignIn");
+      }
+    });
+    return ()=> unsubscribe();
+  },[navigate])
+
+  if(!isAuthenticated){
+    return null;
+  }
 
   // Fetch the current user's email
   useEffect(() => {
@@ -23,23 +48,23 @@ function TrashBin() {
       console.error("User email not set. Cannot fetch projects.");
       return;
     }
-  
+
     try {
       const trashRef = collection(db, "users", userEmail, "TrashBin");
       const snapshot = await getDocs(trashRef);
-  
+
       const currentTime = new Date().getTime(); // Get current time in milliseconds
       const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-  
+
       const trashData = [];
-  
+
       for (const docSnap of snapshot.docs) {
         const docData = docSnap.data();
         const deletedAt = docData.deletedAt?.toMillis(); // Convert Firestore Timestamp to milliseconds
-  
+
         if (deletedAt) {
           const timeDifference = currentTime - deletedAt;
-  
+
           if (timeDifference > thirtyDaysInMillis) {
             // Delete the document permanently
             const docRef = doc(db, "users", userEmail, "TrashBin", docSnap.id);
@@ -53,10 +78,12 @@ function TrashBin() {
             });
           }
         } else {
-          console.warn(`Document ${docSnap.id} does not have a valid deletedAt field.`);
+          console.warn(
+            `Document ${docSnap.id} does not have a valid deletedAt field.`
+          );
         }
       }
-  
+
       console.log("Fetched trash projects:", trashData);
       setTrashProjects(trashData);
     } catch (error) {
@@ -76,7 +103,10 @@ function TrashBin() {
         prev.filter((project) => project.id !== projectId)
       );
     } else {
-      console.error("Failed to restore project:", result.message || result.error);
+      console.error(
+        "Failed to restore project:",
+        result.message || result.error
+      );
     }
   };
 
@@ -96,7 +126,6 @@ function TrashBin() {
   };
 
   // Restore a project: move to Projects collection and delete from TrashBin
- 
 
   return (
     <div className="relative flex min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden">
@@ -175,9 +204,7 @@ function TrashBin() {
                         <td className="h-[72px] px-4 py-2 w-[150px]">
                           <div className="flex space-x-2">
                             <button
-                              onClick={() =>
-                                handlePermanentDelete(project.id)
-                              }
+                              onClick={() => handlePermanentDelete(project.id)}
                               className="bg-red-500 text-white px-2 py-1 rounded"
                             >
                               Delete Permanently

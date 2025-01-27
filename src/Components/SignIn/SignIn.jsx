@@ -7,7 +7,7 @@ import {
   OAuthProvider,
   TwitterAuthProvider,
 } from "firebase/auth";
-import { app } from "../../Backend";
+import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setFromHeroPage } from "../../store/animationSlice";
@@ -52,7 +52,7 @@ function Login() {
           })
         ); // Store username in Redux
         dispatch(setFromHeroPage(false));
-        navigate("/HeroPage");
+        navigate("/Dashboard");
       })
       .catch((error) => console.error("Login failed:", error.message));
   };
@@ -68,12 +68,12 @@ function Login() {
     signInWithPopup(auth, googleProvider)
       .then((result) => {
         const user = result.user;
-        const avatar = user.photoURL; 
+        const avatar = user.photoURL;
         const username = user.displayName || user.email.split("@")[0];
         dispatch(setUser({ avatar, username }));
         console.log("Google sign-in successful, redirecting to HeroPage...");
         console.log("photoURL:", user.photoURL);
-        navigate("/HeroPage");
+        navigate("/Dashboard");
       })
       .catch((error) => {
         if (error.code === "auth/account-exists-with-different-credential") {
@@ -96,7 +96,7 @@ function Login() {
         console.log(
           `${providerName} sign-in successful, redirecting to HeroPage...`
         );
-        navigate("/HeroPage");
+        navigate("/Dashboard");
       })
       .catch((error) => {
         if (error.code === "auth/account-exists-with-different-credential") {
