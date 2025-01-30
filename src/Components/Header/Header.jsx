@@ -54,7 +54,8 @@ function Header() {
   }, []);
 
   return (
-    <header className="bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md ml-[-80px]">
+    <header className="fixed top-0 left-0 w-full bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50">
+
       <nav className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link to={isAuthenticated ? "/Dashboard" : "/HeroPage"} className="flex items-center ml-[80px]">
