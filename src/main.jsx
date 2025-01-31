@@ -82,7 +82,7 @@ const router = createBrowserRouter(
       <Route path="/CreateProject" element={<CreateProject />} />
       <Route path="/Dashboard" element={<Dashboard />} />
       <Route path = "/MyProjects" element={<MyProjects/>}/>
-      <Route path = "/TrashBin" element={<TrashBin/>}/>
+      <Route path = "/Trashbin" element={<TrashBin/>}/>
       <Route path="/Logout" element={<Logout />} />
       <Route path="/successful-projects" element={<SuccessProject/>} />
     </Route>

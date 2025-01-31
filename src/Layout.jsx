@@ -12,6 +12,11 @@ function Layout() {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const footerRef = useRef(null);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
+
   // Check user authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -54,21 +59,21 @@ function Layout() {
         {isAuthenticated && !hideHeaderFooter && (
           <div
             className={`${
-              isFooterVisible ? "relative" : "fixed left-0 top-16"
-            } w-24 h-full bg-[#152d46] flex flex-col items-center py-6 space-y-6 shadow-lg z-30 transition-all duration-300`}
+              isFooterVisible ? "" : " left-0 top-16"
+            } w-24 h-full bg-[#152d46] items-center py-6 space-y-6 shadow-lg z-30 `}
           >
             <Sidebar />
           </div>
         )}
 
         {/* Main Content */}
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col flex-grow mt-14">
           <Outlet />
         </div>
       </div>
 
       {/* Footer positioned above the Sidebar */}
-      <div ref={footerRef} className="absolute bottom-0 w-full z-40">
+      <div ref={footerRef} className="bottom-0 w-full z-40">
         <Footer />
       </div>
     </div>

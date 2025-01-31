@@ -54,11 +54,11 @@ function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50">
+    <header className="fixed top-0 left-0 w-full bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50 ">
 
       <nav className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <Link to={isAuthenticated ? "/Dashboard" : "/HeroPage"} className="flex items-center ml-[80px]">
+        <Link to={isAuthenticated ? "/Dashboard" : "/"} className="flex items-center ml-[80px]">
           <img src="Logo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
           <h1 className="text-3xl font-bold tracking-wide font-LogoFont">
             Momentum
@@ -68,7 +68,7 @@ function Header() {
         {/* Navigation Links */}
         <div className="flex space-x-6">
           <Link
-            to={isAuthenticated ? "/Dashboard" : "/HeroPage"}
+            to={isAuthenticated ? "/Dashboard" : "/"}
             className="text-white hover:text-gray-300 transition duration-300"
           >
             {isAuthenticated ? "Dashboard" : "Home"}

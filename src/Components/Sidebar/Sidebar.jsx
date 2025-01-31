@@ -8,7 +8,7 @@ function Sidebar({ isFooterVisible }) {
     <div
       className={`${
         isFooterVisible ? "relative" : "fixed left-0 top-16"
-      } w-24 h-full bg-[#152d46] flex flex-col items-center py-6 space-y-6 shadow-lg z-40 transition-all duration-300`}
+      } w-24 h-full bg-[#152d46] flex flex-col items-center py-6 space-y-6 shadow-lg z-40 transition-all duration-300 min-h-screen`}
     >
       <button
         onClick={() => navigate("/CreateProject")}
@@ -27,7 +27,7 @@ function Sidebar({ isFooterVisible }) {
         <img
           src="/Sidebar Images/MyProjects.png"
           alt="My Projects"
-          className="w-14 h-14"
+          className="w-12 h-12"
         />
       </button>
       <button

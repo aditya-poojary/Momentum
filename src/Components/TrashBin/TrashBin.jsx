@@ -17,30 +17,18 @@ function TrashBin() {
   const [isAuthenticated,setisauthenticated] =useState(false);
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user)=>{
-      if(user){
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
         setisauthenticated(true);
-      }else{
+        setUserEmail(user.email);
+      } else {
         navigate("/SignIn");
       }
     });
-    return ()=> unsubscribe();
-  },[navigate])
-
-  if(!isAuthenticated){
-    return null;
-  }
-
-  // Fetch the current user's email
-  useEffect(() => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      setUserEmail(user.email);
-    }
-  }, []);
+    return () => unsubscribe();
+  }, [navigate]);
 
   // Fetch projects from TrashBin collection
   const fetchTrashProjects = async () => {
@@ -53,25 +41,23 @@ function TrashBin() {
       const trashRef = collection(db, "users", userEmail, "TrashBin");
       const snapshot = await getDocs(trashRef);
 
-      const currentTime = new Date().getTime(); // Get current time in milliseconds
-      const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+      const currentTime = new Date().getTime();
+      const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
 
       const trashData = [];
 
       for (const docSnap of snapshot.docs) {
         const docData = docSnap.data();
-        const deletedAt = docData.deletedAt?.toMillis(); // Convert Firestore Timestamp to milliseconds
+        const deletedAt = docData.deletedAt?.toMillis();
 
         if (deletedAt) {
           const timeDifference = currentTime - deletedAt;
 
           if (timeDifference > thirtyDaysInMillis) {
-            // Delete the document permanently
             const docRef = doc(db, "users", userEmail, "TrashBin", docSnap.id);
             await deleteDoc(docRef);
             console.log(`Document ${docSnap.id} deleted permanently.`);
           } else {
-            // Add the document to the trashData array if within 30 days
             trashData.push({
               id: docSnap.id,
               ...docData,
@@ -92,8 +78,10 @@ function TrashBin() {
   };
 
   useEffect(() => {
-    fetchTrashProjects();
-  }, [userEmail]);
+    if (isAuthenticated && userEmail) {  // Only fetch when both conditions are met
+      fetchTrashProjects();
+    }
+  }, [isAuthenticated, userEmail]); // Add isAuthenticated to dependencies
 
   const handleRestore = async (projectId) => {
     const result = await restoreAndCleanupProject(userEmail, projectId);
@@ -110,13 +98,11 @@ function TrashBin() {
     }
   };
 
-  // Permanently delete a project from the TrashBin
   const handlePermanentDelete = async (projectId) => {
     try {
       const projectRef = doc(db, "users", userEmail, "TrashBin", projectId);
       await deleteDoc(projectRef);
 
-      // Update the state after deletion
       setTrashProjects((prev) =>
         prev.filter((project) => project.id !== projectId)
       );
@@ -124,8 +110,6 @@ function TrashBin() {
       console.error("Error permanently deleting project:", error);
     }
   };
-
-  // Restore a project: move to Projects collection and delete from TrashBin
 
   return (
     <div className="relative flex min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden">
