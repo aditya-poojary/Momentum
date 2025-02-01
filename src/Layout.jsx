@@ -9,8 +9,14 @@ import { auth } from "./firebase"; // Import Firebase auth instance
 function Layout() {
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const footerRef = useRef(null);
+
+  // Debugging: Log current path
+  useEffect(() => {
+    console.log("Current Path:", location.pathname);
+  }, [location.pathname]);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -20,14 +26,16 @@ function Layout() {
   // Check user authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user); // Set true if a user is logged in, false otherwise
+      setIsAuthenticated(!!user);
+      setLoading(false); // Stop loading once authentication is checked
     });
 
-    return () => unsubscribe(); // Cleanup the listener on component unmount
+    return () => unsubscribe();
   }, []);
 
-  const hideHeaderFooter =
-    location.pathname === "/SignIn" || location.pathname === "/signup";
+  const hideHeaderFooter = ["/signin", "/signup"].includes(
+    location.pathname.toLowerCase()
+  );
 
   // Detect when footer is in viewport
   useEffect(() => {
@@ -49,6 +57,9 @@ function Layout() {
     };
   }, []);
 
+  // Prevent UI flash before auth check completes
+  if (loading) return null;
+
   return (
     <div className="flex flex-col min-h-screen relative">
       {/* Header at the Top */}
@@ -67,14 +78,18 @@ function Layout() {
         )}
 
         {/* Main Content */}
-        <div className="flex flex-col flex-grow mt-14">
+        <div
+          className={`flex flex-col flex-grow ${
+            hideHeaderFooter ? "" : "mt-14"
+          }`}
+        >
           <Outlet />
         </div>
       </div>
 
       {/* Footer positioned above the Sidebar */}
       <div ref={footerRef} className="bottom-0 w-full z-40">
-        <Footer />
+        {!hideHeaderFooter && <Footer />}
       </div>
     </div>
   );

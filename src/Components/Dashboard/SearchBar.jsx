@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"; // For navigation
 import { getDocs, collection, doc } from "firebase/firestore"; // Firebase Firestore
 import { db, app } from "../../firebase";
 import { getAuth } from "firebase/auth";
+import { FiSearch } from "react-icons/fi"; // Importing search icon
 
 export default function SearchBar() {
   const [query, setQuery] = useState(""); // User's search input
@@ -79,17 +80,20 @@ export default function SearchBar() {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      {/* Search Input */}
-      <input
-        type="text"
-        placeholder="Search projects, tasks, and teams"
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
+      {/* Search Input with Icon */}
+      <div className="relative w-full">
+        <FiSearch className="absolute left-4 top-3 text-gray-500 text-lg" />
+        <input
+          type="text"
+          placeholder="Search projects, tasks, and teams"
+          className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
 
       {/* Filtered Projects */}
-      <div className="space-y-4">
+      <div className="space-y-4 mt-4">
         {filteredProjects.map((project) => (
           <div
             key={project.id}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { app } from "../../firebase";
 import { addProjectToUserCollection } from "../../Firestore/UserDocument";
@@ -24,13 +24,13 @@ function CreateProject() {
     const auth = getAuth(app);
     const user = auth.currentUser;
     if (user) {
-      setUserEmail(user.email); // Set the user's email only once
+      setUserEmail(user.email);
     }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = userEmail; // Replace with the logged-in user's email
+    const email = userEmail;
     const projectData = {
       projectName,
       description,
@@ -43,121 +43,131 @@ function CreateProject() {
     try {
       const isDuplicate = await addProjectToUserCollection(email, projectData);
       if (isDuplicate) {
-        setShowDialog(true); // Show dialog box if project is duplicate
+        setShowDialog(true);
       } else {
         console.log("Project created successfully!");
         navigate("/Dashboard");
-        // Navigate after successful creation
       }
     } catch (error) {
       console.error("Error creating project:", error);
     }
   };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md md:max-w-2xl lg:max-w-3xl">
-        <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">
-          Create Project
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 w-full max-w-lg md:max-w-2xl lg:max-w-3xl">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+          Create a New Project
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Project Name */}
             <div>
-              <label className="block text-gray-600 font-semibold mb-1">
+              <label className="block text-gray-700 font-semibold mb-2">
                 Project Name:
               </label>
               <input
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 placeholder="Enter project name"
                 required
               />
             </div>
+
+            {/* Project Description */}
             <div>
-              <label className="block text-gray-600 font-semibold mb-1">
-                Project Description:
+              <label className="block text-gray-700 font-semibold mb-2">
+                Description:
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                placeholder="Enter project description"
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                placeholder="Enter project details"
                 rows="3"
                 required
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-600 font-semibold mb-1">
-                  Category:
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                  required
-                >
-                  <option value="Must Do">M - Must Do</option>
-                  <option value="Should Do">S - Should Do</option>
-                  <option value="Can Do">C - Can Do</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-600 font-semibold mb-1">
-                  Project Start Time/Date:
-                </label>
-                <input
-                  type="datetime-local"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                  required
-                />
-              </div>
-            </div>
+          </div>
+
+          {/* Category and Start Time */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-gray-600 font-semibold mb-1">
-                Deadline:
+              <label className="block text-gray-700 font-semibold mb-2">
+                Category:
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                required
+              >
+                <option value="Must Do">M - Must Do</option>
+                <option value="Should Do">S - Should Do</option>
+                <option value="Can Do">C - Can Do</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Start Date/Time:
               </label>
               <input
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 required
               />
             </div>
           </div>
+
+          {/* Deadline */}
           <div>
-            <label className="block text-gray-600 font-semibold mb-1">
-              % Completed:
+            <label className="block text-gray-700 font-semibold mb-2">
+              Deadline:
+            </label>
+            <input
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            />
+          </div>
+
+          {/* Completion */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Completion (%):
             </label>
             <input
               type="number"
               value={completion}
               onChange={(e) => {
-                const value = Math.max(
-                  0,
-                  Math.min(100, Number(e.target.value))
-                );
+                const value = Math.max(0, Math.min(100, Number(e.target.value)));
                 setCompletion(value);
               }}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              placeholder="Enter percentage completed"
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              placeholder="0-100"
               min="0"
               max="100"
               required
             />
           </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-600 hover:to-blue-800 transition duration-300"
           >
             Create Project
           </button>
         </form>
       </div>
+
       <DialogBox
         show={showDialog}
         title="Duplicate Project"

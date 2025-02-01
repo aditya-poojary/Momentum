@@ -4,7 +4,6 @@ import {
   getDocs,
   doc,
   deleteDoc,
-  setDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -14,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 function TrashBin() {
   const [userEmail, setUserEmail] = useState("");
   const [trashProjects, setTrashProjects] = useState([]);
-  const [isAuthenticated,setisauthenticated] =useState(false);
+  const [isAuthenticated, setisauthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +29,6 @@ function TrashBin() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // Fetch projects from TrashBin collection
   const fetchTrashProjects = async () => {
     if (!userEmail) {
       console.error("User email not set. Cannot fetch projects.");
@@ -78,10 +76,10 @@ function TrashBin() {
   };
 
   useEffect(() => {
-    if (isAuthenticated && userEmail) {  // Only fetch when both conditions are met
+    if (isAuthenticated && userEmail) {
       fetchTrashProjects();
     }
-  }, [isAuthenticated, userEmail]); // Add isAuthenticated to dependencies
+  }, [isAuthenticated, userEmail]);
 
   const handleRestore = async (projectId) => {
     const result = await restoreAndCleanupProject(userEmail, projectId);
@@ -116,11 +114,13 @@ function TrashBin() {
       <div className="flex flex-col h-full">
         <div className="px-40 flex flex-1 justify-center py-5">
           <div className="flex flex-col max-w-[960px] flex-1">
-            <div className="flex flex-wrap justify-between gap-3 p-4">
-              <p className="text-[#0e141b] text-[32px] font-bold leading-tight">
-                Trash Bin
+            {/* Centered Title with Trash Bin Emoji */}
+            <div className="flex justify-center items-center p-4">
+              <p className="text-[#0e141b] text-[32px] font-bold leading-tight flex items-center">
+                🗑️ Trash Bin
               </p>
             </div>
+
             <div className="px-4 py-3">
               <div className="flex overflow-hidden rounded-xl border border-[#d0dbe7] bg-slate-50">
                 <table className="flex-1">
