@@ -4,9 +4,111 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFromHeroPage } from "../../store/animationSlice";
 import { clearUser } from "../../store/userSlice";
 import { logoutUser } from "../Logout/Logout";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../firebase"; // Replace with your actual Firebase config path
-import { HiMenuAlt3, HiX } from "react-icons/hi"; // Importing icons
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+import { auth, app } from "../../firebase"; // Replace with your actual Firebase config path
+import { HiMenuAlt3, HiX } from "react-icons/hi"; // Importing icon
+
+function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const auth = getAuth(app);
+    onAuthStateChanged(auth, (currentUser) => {
+      setIsAuthenticated(!!currentUser); // Set true if user exists, false otherwise
+    });
+  }, []);
+
+  const handleLogout = () => {
+    logoutUser(dispatch, navigate, clearUser);
+    setIsSidebarOpen(false);
+    localStorage.clear();
+  };
+
+  return (
+    <div
+      className={`fixed top-0 left-0 h-full w-64 bg-[#152d46] shadow-lg transform ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      } transition-transform duration-300 ease-in-out md:hidden z-50`}
+    >
+      {/* Sidebar Header */}
+      <div className="flex justify-between items-center p-5 border-b border-gray-600">
+        <h1 className="text-2xl font-bold text-white">Momentum</h1>
+        <button
+          className="text-white text-3xl cursor-pointer hover:text-gray-300"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <HiX />
+        </button>
+      </div>
+
+      {/* Sidebar Links */}
+      <div className="flex flex-col space-y-3 p-6">
+        {isAuthenticated
+          ? // Display all project-related links if user is signed in
+            [
+              {
+                to: user.username ? "/Dashboard" : "/",
+                label: user.username ? "Dashboard" : "Home",
+              },
+              { to: "/CreateProject", label: "Create Project" },
+              { to: "/MyProjects", label: "My Projects" },
+              { to: "/successful-projects", label: "Successful Projects" },
+              { to: "/Features", label: "Features" },
+              { to: "/AboutUs", label: "About Us" },
+              { to: "/ContactUs", label: "Contact Us" },
+
+              { to: "/TrashBin", label: "Trash Bin" },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-white text-lg px-4 py-2 rounded-md cursor-pointer hover:bg-gray-700 transition duration-300"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))
+          : // Display only general navigation links if user is not signed in
+            [
+              { to: "/", label: "Home" },
+              { to: "/Features", label: "Features" },
+              { to: "/AboutUs", label: "About Us" },
+              { to: "/ContactUs", label: "Contact Us" },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-white text-lg px-4 py-2 rounded-md cursor-pointer hover:bg-gray-700 transition duration-300"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+
+        {/* Logout or Login Button */}
+        {isAuthenticated ? (
+          <button
+            onClick={handleLogout}
+            className="text-white text-lg px-4 py-2 rounded-md cursor-pointer hover:bg-gray-700 transition duration-300 text-left"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link
+            to="/SignIn"
+            className="bg-white text-[#152d46] text-center font-medium rounded-lg text-lg px-4 py-2 hover:bg-gray-100 transition duration-300 cursor-pointer"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            Log In
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -64,9 +166,12 @@ function Header() {
           className="md:hidden text-white text-3xl"
           onClick={() => setIsSidebarOpen(true)}
         >
-          <HiMenuAlt3 />
+          <HiMenuAlt3 style={{ transform: "scaleX(-1)" }} />
         </button>
-        <Link to={isAuthenticated ? "/Dashboard" : "/"} className="flex items-center ml-[80px]">
+        <Link
+          to={isAuthenticated ? "/Dashboard" : "/"}
+          className="flex items-center ml-[80px]"
+        >
           <img src="Logo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
           <h1 className="text-3xl font-bold tracking-wide font-LogoFont">
             Momentum
@@ -81,17 +186,25 @@ function Header() {
           >
             {isAuthenticated ? "Dashboard" : "Home"}
           </Link>
-          <Link to="/Features" className="text-white hover:text-gray-300 transition duration-300">
+          <Link
+            to="/Features"
+            className="text-white hover:text-gray-300 transition duration-300"
+          >
             Features
           </Link>
-          <Link to="/AboutUs" className="text-white hover:text-gray-300 transition duration-300">
+          <Link
+            to="/AboutUs"
+            className="text-white hover:text-gray-300 transition duration-300"
+          >
             About Us
           </Link>
-          <Link to="/ContactUs" className="text-white hover:text-gray-300 transition duration-300">
+          <Link
+            to="/ContactUs"
+            className="text-white hover:text-gray-300 transition duration-300"
+          >
             Contact Us
           </Link>
         </div>
-
 
         {/* User Section */}
         {user.avatar || user.username ? (
@@ -130,71 +243,10 @@ function Header() {
       </nav>
 
       {/* Sidebar for Mobile View */}
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-50 ${
-          isSidebarOpen ? "block" : "hidden"
-        } md:hidden`}
-        onClick={() => setIsSidebarOpen(false)}
-      ></div>
-
-      <div
-        className={`fixed top-0 left-0 h-full w-64 bg-[#152d46] shadow-lg transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out md:hidden`}
-      >
-        <div className="flex justify-between items-center p-5">
-          <h1 className="text-2xl font-bold text-white">Momentum</h1>
-          <button className="text-white text-3xl" onClick={() => setIsSidebarOpen(false)}>
-            <HiX />
-          </button>
-        </div>
-        <div className="flex flex-col space-y-6 p-6">
-          <Link
-            to={isAuthenticated ? "/Dashboard" : "/"}
-            className="text-white text-lg hover:text-gray-300 transition duration-300"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            {isAuthenticated ? "Dashboard" : "Home"}
-          </Link>
-          <Link
-            to="/Features"
-            className="text-white text-lg hover:text-gray-300 transition duration-300"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            Features
-          </Link>
-          <Link
-            to="/AboutUs"
-            className="text-white text-lg hover:text-gray-300 transition duration-300"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            About Us
-          </Link>
-          <Link
-            to="/ContactUs"
-            className="text-white text-lg hover:text-gray-300 transition duration-300"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            Contact Us
-          </Link>
-          {user.avatar || user.username ? (
-            <button
-              onClick={handleLogout}
-              className="text-white text-lg hover:text-gray-300 transition duration-300 text-left"
-            >
-              Logout
-            </button>
-          ) : (
-            <Link
-              to="/SignIn"
-              onClick={goToLogin}
-              className="bg-white text-[#152d46] text-center font-medium rounded-lg text-lg px-4 py-2 hover:bg-gray-100 transition duration-300"
-            >
-              Log In
-            </Link>
-          )}
-        </div>
-      </div>
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
     </header>
   );
 }
