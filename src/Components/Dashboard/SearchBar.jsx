@@ -79,35 +79,33 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* Search Input with Icon */}
+    <div className="w-full max-w-3xl mx-auto px-2 md:px-0">
       <div className="relative w-full">
-        <FiSearch className="absolute left-4 top-3 text-gray-500 text-lg" />
+        <FiSearch className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg" />
         <input
           type="text"
-          placeholder="Search projects, tasks, and teams"
-          className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+          placeholder="Search projects..."
+          className="w-full pl-10 md:pl-12 pr-4 py-2 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
 
-      {/* Filtered Projects */}
-      <div className="space-y-4 mt-4">
+      <div className="space-y-2 md:space-y-4 mt-2 md:mt-4">
         {filteredProjects.map((project) => (
           <div
             key={project.id}
-            className="p-4 border rounded-lg shadow hover:shadow-md cursor-pointer transition duration-200 bg-white"
+            className="p-3 md:p-4 border rounded-lg shadow hover:shadow-md cursor-pointer transition duration-200 bg-white"
             onClick={() => handleProjectClick(project)}
           >
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-base md:text-lg font-semibold text-gray-800">
               {project.projectName || "Unnamed Project"}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs md:text-sm text-gray-500 line-clamp-2">
               {project.description || "No description available"}
             </p>
             {project.deadline && (
-              <p className="text-sm text-blue-600 mt-2">
+              <p className="text-xs md:text-sm text-blue-600 mt-1 md:mt-2">
                 Deadline: {formatDeadline(project.deadline)}
               </p>
             )}

@@ -58,31 +58,33 @@ export default function ProjectList() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">My Projects</h2>
-      <ul className="space-y-4">
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
+      <h2 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
+        My Projects
+      </h2>
+      <ul className="space-y-3">
         {projects.map((project) => (
           <li
             key={project.id}
-            className="flex items-center p-4 border rounded-lg shadow-md bg-gray-50"
+            className="flex flex-col md:flex-row md:items-center p-3 md:p-4 border rounded-lg shadow-sm bg-gray-50 gap-3"
           >
             {/* User Avatar */}
-            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-300 mr-4">
-              <span className="text-xl font-semibold text-gray-600">
+            <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-gray-300">
+              <span className="text-lg md:text-xl font-semibold text-gray-600">
                 {project.ownerName?.charAt(0) || "A"}
               </span>
             </div>
             {/* Project Info */}
             <div className="flex-1">
-              <h3 className="text-lg font-medium text-gray-900 truncate">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 truncate">
                 {project.projectName || "Unnamed Project"}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs md:text-sm text-gray-600 line-clamp-2">
                 {project.description || "No description available."}
               </p>
             </div>
             {/* Deadline */}
-            <div className="text-sm text-blue-600 font-medium">
+            <div className="text-xs md:text-sm text-blue-600 font-medium">
               {formatDeadline(project.deadline)}
             </div>
           </li>

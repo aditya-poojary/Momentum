@@ -84,10 +84,12 @@ export default function CalendarOverview() {
   }
 
   return (
-    <div className="max-w-9xl w-[500px] mx-auto p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-6">This Week's Overview</h2>
+    <div className="w-full max-w-[500px] mx-auto p-4 md:p-8 bg-white rounded-lg shadow-lg">
+      <h2 className="text-xl md:text-2xl font-semibold mb-4">
+        This Week's Overview
+      </h2>
       <TooltipProvider>
-        <div className="grid grid-cols-7 gap-4 mb-8">
+        <div className="grid grid-cols-7 gap-2 md:gap-4 mb-6">
           {datesInWeek.map((date, i) => {
             const formattedDate = date.toISOString().split("T")[0];
             const projectsOnDate = projects.filter(
@@ -101,7 +103,7 @@ export default function CalendarOverview() {
               <Tooltip key={i}>
                 <TooltipTrigger>
                   <div
-                    className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
+                    className={`flex flex-col items-center justify-center p-2 md:p-4 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
                       date.toDateString() === new Date().toDateString()
                         ? "bg-blue-50"
                         : ""
@@ -111,10 +113,12 @@ export default function CalendarOverview() {
                         : "border-red-500 text-red-600"
                     }`}
                   >
-                    <div className="text-xs font-semibold uppercase tracking-wider mb-1">
+                    <div className="text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-1">
                       {date.toDateString().slice(0, 3)}
                     </div>
-                    <div className="text-2xl font-bold">{date.getDate()}</div>
+                    <div className="text-base md:text-2xl font-bold">
+                      {date.getDate()}
+                    </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>

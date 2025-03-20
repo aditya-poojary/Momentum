@@ -69,19 +69,17 @@ function Layout() {
         {/* Sidebar - dynamically positioned */}
         {isAuthenticated && !hideHeaderFooter && (
           <div
-            className={`${
-              isFooterVisible ? "" : " left-0 top-16"
-            } w-24 h-full bg-[#152d46] items-center py-6 space-y-6 shadow-lg z-30 `}
+            className={`hidden md:flex w-24 h-full bg-[#152d46] items-center py-6 space-y-6 shadow-lg z-30`}
           >
             <Sidebar />
           </div>
         )}
 
-        {/* Main Content */}
+        {/* Main Content - Removes extra left margin in mobile view */}
         <div
           className={`flex flex-col flex-grow ${
             hideHeaderFooter ? "" : "mt-14"
-          }`}
+          } w-full`}
         >
           <Outlet />
         </div>
@@ -93,6 +91,6 @@ function Layout() {
       </div>
     </div>
   );
-}
+}  
 
 export default Layout;

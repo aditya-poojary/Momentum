@@ -52,23 +52,25 @@ export default function ProjectHoursGraph() {
   }, [userEmail]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg">
+      <h2 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
         Weekly Progress
       </h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart
-          data={graphData}
-          margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-          <YAxis tick={{ fontSize: 12 }} />
-          <Tooltip />
-          <Bar dataKey="totalProgress" fill="#4a90e2" radius={[10, 10, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
-      <p className="text-sm text-gray-500 text-center mt-4">
+      <div className="h-[250px] md:h-[300px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={graphData}
+            margin={{ top: 10, right: 10, left: -20, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+            <YAxis tick={{ fontSize: 10 }} />
+            <Tooltip />
+            <Bar dataKey="totalProgress" fill="#4a90e2" radius={[8, 8, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="text-xs md:text-sm text-gray-500 text-center mt-4">
         Visualizing your progress for the past 7 days.
       </p>
     </div>

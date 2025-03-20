@@ -2,7 +2,6 @@ import SearchBar from "../Components/Dashboard/SearchBar";
 import ProjectList from "../Components/Dashboard/ProjectList";
 import ProjectHoursGraph from "../Components/Dashboard/ProjectHoursGraph";
 import CalendarOverview from "../Components/Dashboard/CalendarOverview";
-import UpcomingMilestones from "../Components/Dashboard/UpcomingMilestones";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -26,37 +25,48 @@ export default function Dashboard() {
   if (!isAuthenticated) {
     return null;
   }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="ml-16 p-8">
+      <div className="ml-4 md:ml-16 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          {/* Top Section */}
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-2xl font-semibold mb-2">
-                Start your day with Projectify
-              </h1>
-              <p className="text-gray-600">
-                Explore projects and track progress easily
-              </p>
-            </div>
-            <Link to="/CreateProject">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Create Project
-              </button>
-            </Link>
-          </div>
-
           {/* Main Content */}
-          <div className="flex gap-8">
-            <div className="flex-1 space-y-8">
-              <SearchBar />
-              <ProjectList />
-              <ProjectHoursGraph />
+          <div className="block lg:flex lg:flex-row gap-4 md:gap-8">
+            {/* Left Section */}
+            <div className="flex-1 space-y-4 md:space-y-8">
+              <div className="w-full mt-4">
+                <SearchBar />
+              </div>
+
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-8 gap-3 md:gap-4 text-center sm:text-left">
+                <div className="w-full">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1 md:mb-2">
+                    Start your day with Projectify
+                  </h1>
+                  <p className="text-xs sm:text-sm md:text-base text-gray-600">
+                    Explore projects and track progress easily
+                  </p>
+                </div>
+                <Link to="/CreateProject" className="w-full sm:w-auto">
+                  <button className="w-full sm:w-auto px-4 md:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm md:text-base">
+                    Create Project
+                  </button>
+                </Link>
+              </div>
+
+              {/* Calendar moves into main column for mobile/tablet */}
+              <div className="lg:hidden mb-4 md:mb-8">
+                <CalendarOverview />
+              </div>
+
+              <div className="space-y-4 md:space-y-8">
+                <ProjectList />
+                <ProjectHoursGraph />
+              </div>
             </div>
 
-            {/* Right Sidebar */}
-            <div className="w-85">
+            {/* Right Sidebar - Only visible on desktop */}
+            <div className="hidden lg:block w-full lg:w-1/3 space-y-6 md:space-y-8">
               <CalendarOverview />
               {/* <UpcomingMilestones /> */}
             </div>
