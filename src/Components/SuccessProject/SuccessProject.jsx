@@ -77,7 +77,9 @@ export default function SuccessProject() {
                   {project.projectName || "Untitled Project"}
                 </CardTitle>
                 <CardDescription className="text-gray-600">
-                  {project.description || "No description available."}
+                {project.description.length > 50
+                            ? project.description.substring(0, 50) + "..."
+                            : project.description}
                 </CardDescription>
               </CardHeader>
               <CardContent>

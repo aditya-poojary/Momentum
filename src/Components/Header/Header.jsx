@@ -56,11 +56,11 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
               { to: "/CreateProject", label: "Create Project" },
               { to: "/MyProjects", label: "My Projects" },
               { to: "/successful-projects", label: "Successful Projects" },
+              { to: "/TrashBin", label: "Trash Bin" },
               { to: "/Features", label: "Features" },
               { to: "/AboutUs", label: "About Us" },
               { to: "/ContactUs", label: "Contact Us" },
 
-              { to: "/TrashBin", label: "Trash Bin" },
             ].map((item) => (
               <Link
                 key={item.to}
