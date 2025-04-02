@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { BadgeCheck, ClipboardList, Users, Trash2, Share2 } from "lucide-react";
+import { BadgeCheck, ClipboardList, Users, Trash2, Share2, } from "lucide-react";
 
 function Features() {
   const features = [
@@ -12,9 +12,9 @@ function Features() {
     },
     {
       icon: <Users className="w-8 h-8 text-green-500" />,
-      title: "Team Collaboration",
+      title: "Dashboard",
       description:
-        "Collaborate with your team seamlessly. Share projects, assign tasks, and track updates in real-time, ensuring everyone stays on the same page.",
+        "Stay organized with the Momentum dashboard—search projects, track pending tasks, view weekly progress, and monitor achievements with a bar graph.",
     },
     {
       icon: <BadgeCheck className="w-8 h-8 text-purple-500" />,
@@ -30,9 +30,9 @@ function Features() {
     },
     {
       icon: <Share2 className="w-8 h-8 text-orange-500" />,
-      title: "Project Sharing",
+      title: "Unlimited Projects",
       description:
-        "Share your projects with stakeholders or teammates. Empower others with access to view or contribute to your projects efficiently.",
+        "Create unlimited projects effortlessly and streamline your path to success with a clear, organized workflow.",
     },
   ];
 

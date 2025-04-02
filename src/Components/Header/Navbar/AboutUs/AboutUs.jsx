@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 function AboutUs() {
   return (
@@ -26,8 +27,10 @@ function AboutUs() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 text-gray-600">
-              At **Momentum**, we believe in empowering individuals to take control of their projects and tasks. 
-              Our platform is designed to make project management seamless, efficient, and enjoyable for everyone.
+              At Momentum, we believe in empowering individuals to take control
+              of their projects and tasks. Our platform is designed to make
+              project management seamless, efficient, and enjoyable for
+              everyone.
             </CardContent>
           </Card>
 
@@ -38,8 +41,10 @@ function AboutUs() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 text-gray-600">
-              Momentum was built with a singular goal in mind: to help users save time and stay organized.
-              With all your projects in one place, you can easily track progress, set priorities, and focus on what matters most.
+              Momentum was built with a singular goal in mind: to help users
+              save time and stay organized. With all your projects in one place,
+              you can easily track progress, set priorities, and focus on what
+              matters most.
             </CardContent>
           </Card>
 
@@ -50,7 +55,8 @@ function AboutUs() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 text-gray-600">
-              From tracking your daily progress to organizing your tasks, Momentum helps you:
+              From tracking your daily progress to organizing your tasks,
+              Momentum helps you:
               <ul className="list-disc ml-6 mt-2 space-y-2">
                 <li>Stay on top of deadlines.</li>
                 <li>Visualize your progress.</li>
@@ -67,11 +73,16 @@ function AboutUs() {
           Ready to Take Control of Your Projects?
         </h2>
         <p className="text-gray-600 mb-6">
-          Join us on this journey to a more organized and efficient you. Let Momentum help you stay focused and productive!
+          Join us on this journey to a more organized and efficient you. Let
+          Momentum help you stay focused and productive!
         </p>
-        <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+
+        <Link
+          to="/Dashboard"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+        >
           Get Started Today
-        </button>
+        </Link>
       </div>
     </div>
   );

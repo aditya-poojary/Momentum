@@ -7,7 +7,10 @@ import {
   addDoc,
   setDoc,
 } from "firebase/firestore";
-import { moveToTrashBin } from "../../Firestore/UserDocument";
+import {
+  moveToTrashBin,
+  updateDailyProgress,
+} from "../../Firestore/UserDocument";
 import { db, app } from "../../firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Button } from "../ui/button";
@@ -109,16 +112,20 @@ export default function MyProjects() {
     if (!editProject) return;
 
     try {
+      const oldCompletion =
+        projects.find((p) => p.id === editProject.id)?.completion || 0;
+      const newCompletion = parseFloat(editProject.completion);
+
       // Parse fields back to their correct types
       const updatedProject = {
         ...editProject,
-        completion: parseFloat(editProject.completion), // Ensure it's a number
+        completion: newCompletion,
         deadline: editProject.deadline
           ? new Date(editProject.deadline).toISOString().split("T")[0]
-          : null, // Ensure it's a valid date
+          : null,
         startTime: editProject.startTime
           ? new Date(editProject.startTime).toISOString()
-          : null, // Ensure it's a valid timestamp
+          : null,
       };
 
       const projectRef = doc(
@@ -131,6 +138,11 @@ export default function MyProjects() {
 
       // Update Firestore
       await updateDoc(projectRef, updatedProject);
+
+      // Update daily progress if completion changed
+      if (oldCompletion !== newCompletion) {
+        await updateDailyProgress(userEmail, oldCompletion, newCompletion);
+      }
 
       // Update state
       setProjects((prev) =>
@@ -175,16 +187,19 @@ export default function MyProjects() {
   return (
     <div className="relative flex min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden">
       <div className="flex flex-col h-full">
-        <div className="px-4 flex flex-1 justify-center py-5" style={{
-          '@media (min-width: 768px)': {
-            paddingLeft: '2rem',
-            paddingRight: '2rem'
-          },
-          '@media (min-width: 1281px)': {
-            paddingLeft: '10rem',
-            paddingRight: '10rem'
-          }
-        }}>
+        <div
+          className="px-4 flex flex-1 justify-center py-5"
+          style={{
+            "@media (min-width: 768px)": {
+              paddingLeft: "2rem",
+              paddingRight: "2rem",
+            },
+            "@media (min-width: 1281px)": {
+              paddingLeft: "10rem",
+              paddingRight: "10rem",
+            },
+          }}
+        >
           <div className="flex flex-col max-w-[960px] flex-1">
             <div className="flex flex-wrap justify-between gap-3 p-4">
               <p className="text-[#0e141b] text-[24px] md:text-[28px] lg:text-[32px] font-bold leading-tight">
@@ -213,24 +228,42 @@ export default function MyProjects() {
             <div className="px-4 py-3">
               <style jsx>{`
                 @media (max-width: 480px) {
-                  .desktop-table { display: none; }
-                  .mobile-cards { display: block; }
+                  .desktop-table {
+                    display: none;
+                  }
+                  .mobile-cards {
+                    display: block;
+                  }
                 }
-                
+
                 @media (min-width: 481px) and (max-width: 767px) {
-                  .desktop-table { display: none; }
-                  .mobile-cards { display: block; }
+                  .desktop-table {
+                    display: none;
+                  }
+                  .mobile-cards {
+                    display: block;
+                  }
                 }
-                
+
                 @media (min-width: 768px) and (max-width: 1024px) {
-                  .desktop-table { display: table; }
-                  .mobile-cards { display: none; }
-                  .hide-tablet { display: none; }
+                  .desktop-table {
+                    display: table;
+                  }
+                  .mobile-cards {
+                    display: none;
+                  }
+                  .hide-tablet {
+                    display: none;
+                  }
                 }
-                
+
                 @media (min-width: 1025px) {
-                  .desktop-table { display: table; }
-                  .mobile-cards { display: none; }
+                  .desktop-table {
+                    display: table;
+                  }
+                  .mobile-cards {
+                    display: none;
+                  }
                 }
               `}</style>
 

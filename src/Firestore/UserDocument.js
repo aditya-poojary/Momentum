@@ -7,6 +7,9 @@ import {
   addDoc,
   deleteDoc,
   Timestamp,
+  query,
+  orderBy,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -244,3 +247,51 @@ export async function saveContactForm(data) {
     console.error("Error adding document: ", e);
   }
 }
+
+/**
+ * Updates the daily progress for a user and maintains a 7-day queue
+ * @param {string} email - User's email
+ * @param {number} oldProgress - Previous completion value
+ * @param {number} newProgress - New completion value
+ */
+export const updateDailyProgress = async (email, oldProgress, newProgress) => {
+  if (!email) throw new Error("Email is required to update daily progress.");
+
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const dailyProgressRef = collection(db, "users", email, "DailyProgress");
+
+    // Get all documents sorted by date
+    const q = query(dailyProgressRef, orderBy("date", "asc"));
+    const snapshot = await getDocs(q);
+    const documents = snapshot.docs;
+
+    // Find today's document
+    const todayDoc = documents.find((doc) => doc.data().date === today);
+    const progressDiff = newProgress - oldProgress;
+
+    if (todayDoc) {
+      // Update today's progress
+      const currentTotal = todayDoc.data().totalProgress || 0;
+      await updateDoc(doc(dailyProgressRef, todayDoc.id), {
+        totalProgress: currentTotal + progressDiff,
+        lastUpdated: Timestamp.now(),
+      });
+    } else {
+      // Create new document for today
+      if (documents.length >= 7) {
+        // Remove oldest document if we already have 7 days
+        await deleteDoc(doc(dailyProgressRef, documents[0].id));
+      }
+
+      // Add new document for today
+      await setDoc(doc(dailyProgressRef, today), {
+        date: today,
+        totalProgress: progressDiff,
+        lastUpdated: Timestamp.now(),
+      });
+    }
+  } catch (error) {
+    console.error("Error updating daily progress:", error);
+  }
+};

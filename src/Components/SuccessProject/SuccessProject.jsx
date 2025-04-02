@@ -59,7 +59,7 @@ export default function SuccessProject() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-white rounded-lg shadow-lg">
+    <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-white rounded-lg shadow-lg h-screen">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         🎉 Successful Projects
       </h1>
