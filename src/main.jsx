@@ -33,6 +33,7 @@ import MyProjects from "./Components/MyProjects/MyProjects.jsx";
 import TrashBin from "./Components/TrashBin/TrashBin.jsx";
 import MyProjectsnew from "./Pages/MyProjectsnew.jsx";
 import SuccessProject from "./Components/SuccessProject/SuccessProject.jsx";
+import TOS from "./Components/TOS & Privacy/TOSPrivacy.jsx";
 
 const auth = getAuth(app);
 
@@ -85,6 +86,7 @@ const router = createBrowserRouter(
       <Route path = "/Trashbin" element={<TrashBin/>}/>
       <Route path="/Logout" element={<Logout />} />
       <Route path="/successful-projects" element={<SuccessProject/>} />
+      <Route path="/tos" element={<TOS/>} />
     </Route>
   )
 );

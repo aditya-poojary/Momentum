@@ -17,7 +17,7 @@ function Footer() {
         </div>
 
         {/* Products Section */}
-        <div>
+        {/* <div>
           <h4 className="text-lg font-semibold mb-2">Products</h4>
           <ul className="space-y-1">
             <li>
@@ -36,7 +36,7 @@ function Footer() {
               </Link>
             </li>
           </ul>
-        </div>
+        </div> */}
 
         {/* About Section */}
         <div>
@@ -65,7 +65,7 @@ function Footer() {
           <h4 className="text-lg font-semibold mb-2">Legal</h4>
           <ul className="space-y-1">
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
+              <Link to="/tos" className="text-gray-300 hover:text-white transition">
                 Terms of Use
               </Link>
             </li>
