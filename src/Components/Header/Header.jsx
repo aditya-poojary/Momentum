@@ -60,7 +60,6 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
               { to: "/Features", label: "Features" },
               { to: "/AboutUs", label: "About Us" },
               { to: "/ContactUs", label: "Contact Us" },
-
             ].map((item) => (
               <Link
                 key={item.to}
@@ -158,9 +157,8 @@ function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50">
+    <header className="fixed top-0 left-0 w-full min-w-[200px] bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50">
       <nav className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
         {/* Mobile Menu Button */}
         <button
           className="md:hidden text-white text-3xl"
@@ -170,37 +168,37 @@ function Header() {
         </button>
         <Link
           to={isAuthenticated ? "/Dashboard" : "/"}
-          className="flex items-center ml-[80px]"
+          className="flex items-center ml-2 md:ml-[80px]"
         >
-          <img src="Logo.jpg" alt="Logo" className="h-10 w-10 mr-3" />
-          <h1 className="text-3xl font-bold tracking-wide font-LogoFont">
+          <img src="Logo.jpg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 mr-2 md:mr-3" />
+          <h1 className="text-2xl md:text-3xl font-bold tracking-wide font-LogoFont">
             Momentum
           </h1>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-4 lg:space-x-6">
           <Link
             to={isAuthenticated ? "/Dashboard" : "/"}
-            className="text-white hover:text-gray-300 transition duration-300"
+            className="text-white hover:text-gray-300 transition duration-300 whitespace-nowrap"
           >
             {isAuthenticated ? "Dashboard" : "Home"}
           </Link>
           <Link
             to="/Features"
-            className="text-white hover:text-gray-300 transition duration-300"
+            className="text-white hover:text-gray-300 transition duration-300 whitespace-nowrap"
           >
             Features
           </Link>
           <Link
             to="/AboutUs"
-            className="text-white hover:text-gray-300 transition duration-300"
+            className="text-white hover:text-gray-300 transition duration-300 whitespace-nowrap"
           >
             About Us
           </Link>
           <Link
             to="/ContactUs"
-            className="text-white hover:text-gray-300 transition duration-300"
+            className="text-white hover:text-gray-300 transition duration-300 whitespace-nowrap"
           >
             Contact Us
           </Link>

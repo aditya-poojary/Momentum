@@ -159,31 +159,33 @@ export default function CalendarOverview() {
                 borderLeftColor: project.completed ? "#10B981" : "#EF4444",
               }}
             >
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+              <CardHeader className="pb-2">
                 <div className="space-y-1">
                   <CardTitle className="text-xl font-semibold group-hover:text-gray-900">
                     {project.title}
                   </CardTitle>
+                  
+                  <div className="flex justify-center my-2">
+                    <Badge
+                      variant={project.completed ? "success" : "destructive"}
+                      className={`px-3 py-1 text-sm font-medium rounded-full flex items-center gap-1 ${
+                        project.completed
+                          ? "bg-green-100 text-green-600 hover:bg-green-200"
+                          : "bg-red-100 text-red-600 hover:bg-red-200"
+                      }`}
+                    >
+                      {project.completed ? (
+                        <CheckCircle className="h-4 w-4" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4" />
+                      )}
+                      <span>{project.completed ? "Completed" : "Pending"}</span>
+                    </Badge>
+                  </div>
+                  
                   <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
                     {project.description}
                   </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {project.completed ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <AlertCircle className="h-5 w-5 text-red-500" />
-                  )}
-                  <Badge
-                    variant={project.completed ? "success" : "destructive"}
-                    className={`px-3 py-1 text-sm font-medium rounded-full ${
-                      project.completed
-                        ? "bg-green-100 text-green-600 hover:bg-green-200"
-                        : "bg-red-100 text-red-600 hover:bg-red-200"
-                    }`}
-                  >
-                    {project.completed ? "Completed" : "Pending"}
-                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
