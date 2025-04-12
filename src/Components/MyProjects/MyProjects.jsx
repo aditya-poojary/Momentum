@@ -236,7 +236,7 @@ export default function MyProjects() {
                   }
                 }
 
-                @media (min-width: 481px) and (max-width: 767px) {
+                @media (min-width: 481px) and (max-width: 767.98px) {
                   .desktop-table {
                     display: none;
                   }

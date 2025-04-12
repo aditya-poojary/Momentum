@@ -17,44 +17,47 @@ function Footer() {
         </div>
 
         {/* Products Section */}
-        {/* <div>
-          <h4 className="text-lg font-semibold mb-2">Products</h4>
+        <div>
+          <h4 className="text-lg font-semibold mb-2">Features</h4>
           <ul className="space-y-1">
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
-                Photo Editor
+              <Link to="/CreateProject" className="text-gray-300 hover:text-white transition">
+                Create Project
               </Link>
             </li>
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
-                Video Editor
+              <Link to="/MyProjects" className="text-gray-300 hover:text-white transition">
+                My Projects
               </Link>
             </li>
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
-                Mobile Apps
+              <Link to="/successful-projects" className="text-gray-300 hover:text-white transition">
+                Successful Projects
+              </Link>
+            </li>
+            <li>
+              <Link to="/TrashBin" className="text-gray-300 hover:text-white transition">
+                Trash Projects
               </Link>
             </li>
           </ul>
-        </div> */}
-
-        {/* About Section */}
+        </div> 
         <div>
           <h4 className="text-lg font-semibold mb-2">About</h4>
           <ul className="space-y-1">
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
+              <Link to="/Features" className="text-gray-300 hover:text-white transition">
                 About Us
               </Link>
             </li>
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
-                Careers
+              <Link to="/AboutUs" className="text-gray-300 hover:text-white transition">
+                Features
               </Link>
             </li>
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
-                Affiliates Program
+              <Link to="/ContactUs" className="text-gray-300 hover:text-white transition">
+                Contact Us
               </Link>
             </li>
           </ul>
@@ -70,7 +73,7 @@ function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="#" className="text-gray-300 hover:text-white transition">
+              <Link to="/privacypolicy" className="text-gray-300 hover:text-white transition">
                 Privacy Policy
               </Link>
             </li>

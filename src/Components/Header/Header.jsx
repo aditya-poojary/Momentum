@@ -157,7 +157,7 @@ function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full min-w-[200px] bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50">
+    <header className="fixed top-0 left-0 w-full  bg-gradient-to-br from-[#152d30] to-[#152d70] text-white p-4 shadow-md z-50">
       <nav className="container mx-auto flex justify-between items-center">
         {/* Mobile Menu Button */}
         <button

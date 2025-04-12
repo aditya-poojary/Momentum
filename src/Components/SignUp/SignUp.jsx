@@ -25,6 +25,8 @@ function SignUp() {
   const [initialAnimation, setInitialAnimation] = useState(true);
   const [fadeInImage, setFadeInImage] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,10 +95,16 @@ function SignUp() {
       })
       .catch((error) => {
         if (error.code === "auth/account-exists-with-different-credential") {
-          setPopupMessage(
-            "An account with this email already exists. Please sign in instead."
-          );
           setShowPopup(true);
+          {
+            showPopup && (
+              <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="bg-white p-4 rounded-lg shadow-lg border border-red-300">
+                  <p className="text-red-600">{popupMessage}</p>
+                </div>
+              </div>
+            );
+          }
           setTimeout(() => {
             setShowPopup(false);
             navigate("/SignIn");

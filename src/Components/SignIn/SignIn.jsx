@@ -5,112 +5,137 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   OAuthProvider,
-  TwitterAuthProvider,
+  TwitterAuthProvider
 } from "firebase/auth";
 import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setFromHeroPage } from "../../store/animationSlice";
 import { setUser } from "../../store/userSlice";
+import { createOrFetchUserDocument } from "../../Firestore/UserDocument"; // Import the user document utility
+
 const googleProvider = new GoogleAuthProvider();
 const microsoftProvider = new OAuthProvider("microsoft.com");
 const twitterProvider = new TwitterAuthProvider();
+
+// Add email scope to Twitter provider
+twitterProvider.setCustomParameters({
+  include_email: 'true' // Request email from Twitter
+});
+
+// Add email scope to Google provider
+googleProvider.addScope('email');
+
+// Add email scope to Microsoft provider
+microsoftProvider.addScope('email');
+
 const auth = getAuth(app);
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showSignUp, setShowSignUp] = useState(false); // Toggle for signup animation
-  const [initialAnimation, setInitialAnimation] = useState(true); // Toggle for initial form animation
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [initialAnimation, setInitialAnimation] = useState(true);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const fromHeroPage = useSelector((state) => state.animation.fromHeroPage); // Get from Redux
+  const fromHeroPage = useSelector((state) => state.animation.fromHeroPage);
 
   useEffect(() => {
     if (fromHeroPage) {
       setTimeout(() => dispatch(setFromHeroPage(false)), 100);
     }
 
-    // Trigger the initial form animation
     const timer = setTimeout(() => {
       setInitialAnimation(false);
-    }, 100); // Delay to allow the initial render before starting the animation
+    }, 100);
 
-    return () => clearTimeout(timer); // Cleanup the timer on unmount
+    return () => clearTimeout(timer);
   }, [fromHeroPage, dispatch]);
+
+  const handleAuthSuccess = async (user) => {
+    try {
+      // Get user email, throw error if not available
+      const userEmail = user.email;
+      if (!userEmail) {
+        throw new Error("User email is required. Please use an authentication method that provides email access.");
+      }
+      
+      // Create or fetch user document with verified email
+      await createOrFetchUserDocument({
+        uid: user.uid,
+        email: userEmail,
+        displayName: user.displayName,
+        photoURL: user.photoURL
+      });
+      
+      // Store user data in Redux
+      const username = user.displayName || userEmail.split("@")[0];
+      const avatar = user.photoURL || "/default-avatar.png";
+      
+      dispatch(setUser({
+        email: userEmail,
+        uid: user.uid,
+        username: username,
+        avatar: avatar
+      }));
+      
+      // Navigate to dashboard
+      dispatch(setFromHeroPage(false));
+      navigate("/Dashboard");
+    } catch (error) {
+      console.error("Error setting up user:", error);
+      setError("Failed to set up user account: " + error.message);
+    }
+  };
 
   const loginUser = (e) => {
     e.preventDefault();
+    setError("");
+    
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
-        const user = result.user;
-        const username = user.email.split("@")[0]; // Extract username from email
-        dispatch(
-          setUser({
-            username,
-            avatar: "default-avatar.png", // Set the default avatar
-          })
-        ); // Store username in Redux
-        dispatch(setFromHeroPage(false));
-        navigate("/Dashboard");
+        handleAuthSuccess(result.user);
       })
-      .catch((error) => console.error("Login failed:", error.message));
+      .catch((error) => {
+        console.error("Login failed:", error.message);
+        setError("Login failed: " + error.message);
+      });
   };
 
   const goToSignUp = () => {
-    setShowSignUp(true); // Start transition animation
+    setShowSignUp(true);
     setTimeout(() => {
       navigate("/signup");
-    }, 500); // Delay navigation until animation finishes
-  };
-
-  const googleLoginHandler = () => {
-    signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        const user = result.user;
-        const avatar = user.photoURL;
-        const username = user.displayName || user.email.split("@")[0];
-        dispatch(setUser({ avatar, username }));
-        console.log("Google sign-in successful, redirecting to HeroPage...");
-        console.log("photoURL:", user.photoURL);
-        navigate("/Dashboard");
-      })
-      .catch((error) => {
-        if (error.code === "auth/account-exists-with-different-credential") {
-          console.error(
-            "Account exists with a different credential for Google"
-          );
-        } else {
-          console.error("Google sign-in failed:", error.message);
-        }
-      });
+    }, 500);
   };
 
   const handleSignIn = (provider, providerName) => {
+    setError("");
+    
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
-        const avatar = user.photoURL || "/default-avatar.png"; // Fallback to default avatar
-        const username = user.displayName || user.email.split("@")[0];
-        dispatch(setUser({ avatar, username }));
-        console.log(
-          `${providerName} sign-in successful, redirecting to HeroPage...`
-        );
-        navigate("/Dashboard");
+        
+        // For Twitter specifically, check if email was received
+        if (providerName === "Twitter" && !user.email) {
+          throw new Error("Email access was not granted by Twitter. Please try another sign-in method.");
+        }
+        
+        handleAuthSuccess(user);
       })
       .catch((error) => {
         if (error.code === "auth/account-exists-with-different-credential") {
-          console.error(
-            `Account exists with a different credential for ${providerName}`
-          );
+          setError(`Account exists with a different credential for ${providerName}`);
         } else {
-          console.error(`${providerName} sign-in failed:`, error.message);
+          setError(`${providerName} sign-in failed: ${error.message}`);
         }
+        console.error(`${providerName} sign-in failed:`, error.message);
       });
   };
 
-  const signinwithMicrosoft = () =>
-    handleSignIn(microsoftProvider, "Microsoft");
+  const googleLoginHandler = () => handleSignIn(googleProvider, "Google");
+  const signinwithMicrosoft = () => handleSignIn(microsoftProvider, "Microsoft");
   const signinwithTwitter = () => handleSignIn(twitterProvider, "Twitter");
 
   return (
@@ -119,7 +144,7 @@ function Login() {
       <div
         className={`hidden lg:flex w-1/2 items-center justify-center transform transition-all duration-1000 overflow-hidden ${
           showSignUp
-            ? "translate-x-full opacity-0" // Exit animation with fade-out on signup redirect
+            ? "translate-x-full opacity-0"
             : fromHeroPage
             ? "-translate-x-full opacity-0"
             : "translate-x-0 opacity-100"
@@ -148,6 +173,13 @@ function Login() {
           <h2 className="text-3xl font-bold text-[#152d80] mb-4">
             Sign In to Your Account
           </h2>
+          
+          {error && (
+            <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+          
           <form className="space-y-4" onSubmit={loginUser}>
             <div>
               <label className="block text-gray-700 font-semibold mb-1">
@@ -186,7 +218,7 @@ function Login() {
             onClick={goToSignUp}
             className="mt-4 text-sm text-[#152d80] underline"
           >
-            Don’t have an account? Sign up
+            Don't have an account? Sign up
           </button>
 
           {/* Social Media Icons Below Sign Up Button */}
@@ -225,7 +257,6 @@ function Login() {
                 className="p-2 rounded-full hover:bg-gray-200 transition duration-300"
                 onClick={signinwithMicrosoft}
               >
-                {" "}
                 <svg className="w-6 h-6 text-gray-500" viewBox="0 0 48 48">
                   <g>
                     <path fill="#f25022" d="M0 0h22v22H0z" />

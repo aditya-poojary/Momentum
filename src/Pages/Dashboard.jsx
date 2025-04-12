@@ -41,7 +41,7 @@ export default function Dashboard() {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-8 gap-3 md:gap-4 text-center sm:text-left">
                 <div className="w-full">
                   <h1 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1 md:mb-2">
-                    Start your day with Projectify
+                    Start your day with Momentum
                   </h1>
                   <p className="text-xs sm:text-sm md:text-base text-gray-600">
                     Explore projects and track progress easily
