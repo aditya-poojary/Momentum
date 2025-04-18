@@ -21,7 +21,7 @@ export default function ProjectHoursGraph() {
     const auth = getAuth(app);
     const user = auth.currentUser;
     if (user) {
-      setUserEmail(user.email);
+      setUserEmail(`${user.providerData[0].uid}@gmail.com`);
     }
   }, []);
 

@@ -41,7 +41,7 @@ export default function MyProjects() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setisauthenticated(true);
-        setUserEmail(user.email);
+        setUserEmail(`${user.providerData[0].uid}@gmail.com`);
       } else {
         setisauthenticated(false);
         navigate("/SignIn");
@@ -190,11 +190,11 @@ export default function MyProjects() {
         <div
           className="px-4 flex flex-1 justify-center py-5"
           style={{
-            "@media (min-width: 768px)": {
+            "@media (minWidth: 768px)": {
               paddingLeft: "2rem",
               paddingRight: "2rem",
             },
-            "@media (min-width: 1281px)": {
+            "@media (minWidth: 1281px)": {
               paddingLeft: "10rem",
               paddingRight: "10rem",
             },
@@ -226,7 +226,7 @@ export default function MyProjects() {
 
             {/* Projects Table */}
             <div className="px-4 py-3">
-              <style jsx>{`
+              <style>{`
                 @media (max-width: 480px) {
                   .desktop-table {
                     display: none;

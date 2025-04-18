@@ -46,7 +46,7 @@ function SignUp() {
   const signupUser = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
-      .then(() => navigate("/Dashboard"))
+      .then((result) => handleAuthSuccess(result.user))
       .catch((error) => console.error("Signup failed:", error.message));
   };
 
@@ -61,25 +61,20 @@ function SignUp() {
 
   const handleAuthSuccess = async (user) => {
     try {
-      console.log("Signup user data:", user); // Debug log
+      console.log("Signup user data:", user);
 
-      // Get user email, ensure it exists
-      let userEmail = user.email;
-
-      if (!userEmail && user.providerData && user.providerData[0]) {
-        if (user.providerData[0].providerId === "twitter.com") {
-          userEmail = `${user.providerData[0].uid}@twitter.user`;
-          console.log("Created Twitter email:", userEmail);
-        }
-      }
-
+      const userEmail = user.email;
       if (!userEmail) {
         throw new Error("Email is required for signup");
       }
 
-      // Create or fetch user document
-      await createOrFetchUserDocument(userEmail);
-      console.log("User document created/fetched for:", userEmail);
+      // Pass complete user object
+      await createOrFetchUserDocument({
+        email: userEmail,
+        uid: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      });
 
       const username = user.displayName || userEmail.split("@")[0];
       const avatar = user.photoURL || "/default-avatar.png";

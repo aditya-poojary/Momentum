@@ -16,7 +16,7 @@ export default function SuccessProject() {
     const auth = getAuth(app);
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserEmail(user.email);
+        setUserEmail(`${user.providerData[0].uid}@gmail.com`);
       } else {
         navigate("/SignIn");
       }

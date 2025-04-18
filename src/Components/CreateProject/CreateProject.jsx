@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getDatabase } from "firebase/database";
-import { getAuth } from "firebase/auth";
 import { app } from "../../firebase";
 import { addProjectToUserCollection } from "../../Firestore/UserDocument";
 import { useNavigate } from "react-router-dom";
 import DialogBox from "./DialogBox/DialogBox";
+import { useUserEmail } from "../../hooks/useUserEmail";
 
 const db = getDatabase(app);
 function CreateProject() {
@@ -14,23 +14,20 @@ function CreateProject() {
   const [category, setCategory] = useState("Can Do");
   const [deadline, setDeadline] = useState("");
   const [completion, setCompletion] = useState(0);
-  const [userEmail, setUserEmail] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
+  const { userEmail, loading } = useUserEmail();
 
   const handleCloseDialog = () => setShowDialog(false);
 
-  useEffect(() => {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-    if (user) {
-      setUserEmail(user.email);
-    }
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = userEmail;
+
+    if (loading || !userEmail) {
+      console.error("User email not available");
+      return;
+    }
+
     const projectData = {
       projectName,
       description,
@@ -41,7 +38,10 @@ function CreateProject() {
     };
 
     try {
-      const isDuplicate = await addProjectToUserCollection(email, projectData);
+      const isDuplicate = await addProjectToUserCollection(
+        userEmail,
+        projectData
+      );
       if (isDuplicate) {
         setShowDialog(true);
       } else {
@@ -147,7 +147,10 @@ function CreateProject() {
               type="number"
               value={completion}
               onChange={(e) => {
-                const value = Math.max(0, Math.min(100, Number(e.target.value)));
+                const value = Math.max(
+                  0,
+                  Math.min(100, Number(e.target.value))
+                );
                 setCompletion(value);
               }}
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"

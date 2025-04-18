@@ -21,10 +21,14 @@ import { db } from "../firebase";
 export const createOrFetchUserDocument = async (user) => {
   let email;
 
-  // Handle different types of input
+  // Handle different types of input with better null checking
+  if (!user) {
+    throw new Error("User is required to create or fetch user document.");
+  }
+
   if (typeof user === "string") {
     email = user;
-  } else if (typeof user === "object" && user !== null) {
+  } else if (typeof user === "object") {
     email = user.email;
   }
 
@@ -310,5 +314,45 @@ export const updateDailyProgress = async (email, oldProgress, newProgress) => {
     }
   } catch (error) {
     console.error("Error updating daily progress:", error);
+  }
+};
+
+/**
+ * Creates a minimal user document with just the email if it doesn't exist in Firestore
+ * @param {(string|Object)} user - Email string or object containing email
+ * @returns {Promise<boolean>} - Returns true if document was created, false if already exists
+ */
+export const createMinimalUserDocument = async (user) => {
+  let email;
+
+  // Handle different types of input
+  if (typeof user === "string") {
+    email = user;
+  } else if (typeof user === "object" && user !== null) {
+    email = user.email || (user.userEmail ? user.userEmail : null);
+  }
+
+  if (!email) {
+    throw new Error("Email is required to create a user document.");
+  }
+
+  try {
+    const userDocRef = doc(db, "users", email);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      // Create the simplest document with just email
+      await setDoc(userDocRef, {
+        
+      });
+      console.log("Minimal user document created for:", email);
+      return true;
+    } else {
+      console.log("User document already exists for:", email);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error creating minimal user document:", error);
+    throw error;
   }
 };

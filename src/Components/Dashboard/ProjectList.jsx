@@ -3,25 +3,18 @@ import { collection, getDocs, doc } from "firebase/firestore";
 import { db, app } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useUserEmail } from "../../hooks/useUserEmail";
 
 export default function ProjectList() {
   const [projects, setProjects] = useState([]);
-  const [userEmail, setUserEmail] = useState("");
+  const { userEmail, loading } = useUserEmail();
 
   const navigate = useNavigate();
-
-  // Fetch the current user's email
-  useEffect(() => {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-    if (user) {
-      setUserEmail(user.email);
-    }
-  }, []);
 
   // Fetch projects from Firestore
   useEffect(() => {
     const fetchProjects = async () => {
+      if (loading) return;
       if (userEmail) {
         try {
           const userDoc = doc(db, "users", userEmail);
@@ -40,7 +33,7 @@ export default function ProjectList() {
     };
 
     fetchProjects();
-  }, [userEmail]);
+  }, [userEmail, loading]);
 
   // Format deadline display
   const formatDeadline = (deadline) => {

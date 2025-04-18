@@ -12,7 +12,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setFromHeroPage } from "../../store/animationSlice";
 import { setUser } from "../../store/userSlice";
-import { createOrFetchUserDocument } from "../../Firestore/UserDocument"; // Import the user document utility
+import {
+  createOrFetchUserDocument,
+  createMinimalUserDocument,
+} from "../../Firestore/UserDocument"; // Import the user document utility
 
 const googleProvider = new GoogleAuthProvider();
 const microsoftProvider = new OAuthProvider("microsoft.com");
@@ -64,10 +67,8 @@ function Login() {
       // Handle Twitter case where email might not be available
       if (!userEmail && user.providerData && user.providerData[0]) {
         if (user.providerData[0].providerId === "twitter.com") {
-          userEmail = `${user.providerData[0].uid}@twitter.user`;
+          userEmail = `${user.providerData[0].uid}@gmail.com`;
           console.log("Created Twitter email:", userEmail);
-          
-      await createOrFetchUserDocument(userEmail);
         }
       }
 
@@ -75,9 +76,8 @@ function Login() {
         throw new Error("No email available from authentication provider");
       }
 
-      // Create or fetch user document
-      await createOrFetchUserDocument(userEmail);
-      console.log("User document created/fetched for:", userEmail);
+      // Pass just the email string to createMinimalUserDocument
+      await createMinimalUserDocument(userEmail);
 
       // Store user data in Redux
       const username = user.displayName || userEmail.split("@")[0];

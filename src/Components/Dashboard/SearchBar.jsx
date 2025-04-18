@@ -4,27 +4,20 @@ import { getDocs, collection, doc } from "firebase/firestore"; // Firebase Fires
 import { db, app } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import { FiSearch } from "react-icons/fi"; // Importing search icon
+import { useUserEmail } from "../../hooks/useUserEmail";
 
 export default function SearchBar() {
   const [query, setQuery] = useState(""); // User's search input
   const [projects, setProjects] = useState([]); // All projects from Firebase
   const [filteredProjects, setFilteredProjects] = useState([]); // Filtered results
-  const [userEmail, setUserEmail] = useState("");
+  const { userEmail, loading } = useUserEmail();
 
   const navigate = useNavigate(); // Hook for navigation
-
-  // Fetch the current user's email
-  useEffect(() => {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-    if (user) {
-      setUserEmail(user.email);
-    }
-  }, []);
 
   // Fetch projects from Firebase
   useEffect(() => {
     const fetchProjects = async () => {
+      if (loading) return;
       if (userEmail) {
         try {
           // Navigate to the user's document and access the "Projects" subcollection
@@ -44,7 +37,7 @@ export default function SearchBar() {
     };
 
     fetchProjects();
-  }, [userEmail]);
+  }, [userEmail, loading]);
 
   // Update filtered results as the user types
   useEffect(() => {

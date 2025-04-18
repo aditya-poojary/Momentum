@@ -17,7 +17,7 @@ function TrashBin() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setisauthenticated(true);
-        setUserEmail(user.email);
+        setUserEmail(`${user.providerData[0].uid}@gmail.com`);
       } else {
         navigate("/SignIn");
       }
