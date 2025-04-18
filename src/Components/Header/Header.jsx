@@ -170,7 +170,11 @@ function Header() {
           to={isAuthenticated ? "/Dashboard" : "/"}
           className="flex items-center ml-2 md:ml-[80px]"
         >
-          <img src="Logo.jpg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 mr-2 md:mr-3" />
+          <img
+            src="Logo.jpg"
+            alt="Logo"
+            className="h-8 w-8 md:h-10 md:w-10 mr-2 md:mr-3"
+          />
           <h1 className="text-2xl md:text-3xl font-bold tracking-wide font-LogoFont">
             Momentum
           </h1>
@@ -205,7 +209,7 @@ function Header() {
         </div>
 
         {/* User Section */}
-        {user.avatar || user.username ? (
+        {isAuthenticated ? (
           <div ref={dropdownRef} className="relative hidden md:block">
             <div
               className="flex items-center space-x-2 cursor-pointer"

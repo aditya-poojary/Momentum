@@ -15,26 +15,43 @@ import { db } from "../firebase";
 
 /**
  * Create or fetch a user document in the Firestore database.
- * @param {string} email - The email of the logged-in user.
+ * @param {(string|Object)} user - Either an email string or user object containing email
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-export const createOrFetchUserDocument = async (email) => {
-  if (!email)
+export const createOrFetchUserDocument = async (user) => {
+  let email;
+
+  // Handle different types of input
+  if (typeof user === "string") {
+    email = user;
+  } else if (typeof user === "object" && user !== null) {
+    email = user.email;
+  }
+
+  if (!email) {
     throw new Error("Email is required to create or fetch user document.");
+  }
 
   try {
-    const userDocRef = doc(db, "users", email); // Reference to the user document
-    const userDoc = await getDoc(userDocRef); // Fetch the document
+    const userDocRef = doc(db, "users", email);
+    const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
-      // Create a new document if it doesn't exist
-      await setDoc(userDocRef, {}); // Add fields later as needed
-      console.log("New user document created.");
+      // Create a new document with basic user info
+      await setDoc(userDocRef, {
+        email: email,
+        createdAt: Timestamp.now(),
+        ...(user.displayName && { displayName: user.displayName }),
+        ...(user.photoURL && { photoURL: user.photoURL }),
+        ...(user.uid && { uid: user.uid }),
+      });
+      console.log("New user document created for:", email);
     } else {
-      console.log("Existing user document found.");
+      console.log("Existing user document found for:", email);
     }
   } catch (error) {
     console.error("Error creating or fetching user document:", error);
+    throw error; // Re-throw to handle in the calling function
   }
 };
 

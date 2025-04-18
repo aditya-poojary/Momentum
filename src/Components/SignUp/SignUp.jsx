@@ -46,7 +46,7 @@ function SignUp() {
   const signupUser = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
-      .then(() => navigate("/HeroPage"))
+      .then(() => navigate("/Dashboard"))
       .catch((error) => console.error("Signup failed:", error.message));
   };
 
@@ -59,40 +59,63 @@ function SignUp() {
 
   const dispatch = useDispatch();
 
+  const handleAuthSuccess = async (user) => {
+    try {
+      console.log("Signup user data:", user); // Debug log
+
+      // Get user email, ensure it exists
+      let userEmail = user.email;
+
+      if (!userEmail && user.providerData && user.providerData[0]) {
+        if (user.providerData[0].providerId === "twitter.com") {
+          userEmail = `${user.providerData[0].uid}@twitter.user`;
+          console.log("Created Twitter email:", userEmail);
+        }
+      }
+
+      if (!userEmail) {
+        throw new Error("Email is required for signup");
+      }
+
+      // Create or fetch user document
+      await createOrFetchUserDocument(userEmail);
+      console.log("User document created/fetched for:", userEmail);
+
+      const username = user.displayName || userEmail.split("@")[0];
+      const avatar = user.photoURL || "/default-avatar.png";
+
+      dispatch(
+        setUser({
+          email: userEmail,
+          uid: user.uid,
+          username: username,
+          avatar: avatar,
+        })
+      );
+
+      navigate("/Dashboard");
+    } catch (error) {
+      console.error("Error in handleAuthSuccess:", error);
+      setPopupMessage("Error creating account: " + error.message);
+      setShowPopup(true);
+    }
+  };
+
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        const user = result.user;
-        const avatar = user.photoURL || "/default-avatar.png";
-        const username = user.displayName || user.email.split("@")[0];
-        dispatch(setUser({ avatar, username }));
-        navigate("/HeroPage");
-      })
+      .then((result) => handleAuthSuccess(result.user))
       .catch(handleSignInError);
   };
 
   const handleMicrosoftSignIn = () => {
     signInWithPopup(auth, microsoftProvider)
-      .then((result) => {
-        const user = result.user;
-        const avatar = user.photoURL || "/default-avatar.png";
-        const username = user.displayName || user.email.split("@")[0];
-        dispatch(setUser({ avatar, username }));
-        navigate("/HeroPage");
-      })
+      .then((result) => handleAuthSuccess(result.user))
       .catch(handleSignInError);
   };
 
   const handleTwitterSignIn = () => {
     signInWithPopup(auth, twitterProvider)
-      .then((result) => {
-        const user = result.user;
-        const avatar = user.photoURL || "/default-avatar.png"; // Fallback image if Twitter doesn't provide one
-        const username = user.displayName || user.email.split("@")[0]; // Use part of email as fallback for username
-        dispatch(setUser({ avatar, username }));
-        console.log("Twitter sign-in successful, redirecting to HeroPage...");
-        navigate("/HeroPage"); // Navigate after successful authentication
-      })
+      .then((result) => handleAuthSuccess(result.user))
       .catch((error) => {
         if (error.code === "auth/account-exists-with-different-credential") {
           setShowPopup(true);

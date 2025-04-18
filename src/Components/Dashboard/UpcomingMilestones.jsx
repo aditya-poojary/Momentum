@@ -50,7 +50,7 @@ export default function UpcomingMilestones() {
   }, [datesInWeek]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loadingawesdrtfyguhijokpl...</div>;
   }
 
   return (

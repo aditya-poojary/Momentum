@@ -5,7 +5,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   OAuthProvider,
-  TwitterAuthProvider
+  TwitterAuthProvider,
 } from "firebase/auth";
 import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
@@ -20,14 +20,15 @@ const twitterProvider = new TwitterAuthProvider();
 
 // Add email scope to Twitter provider
 twitterProvider.setCustomParameters({
-  include_email: 'true' // Request email from Twitter
+  include_email: "true",
+  lang: "en", // Request email and set language to English
 });
 
 // Add email scope to Google provider
-googleProvider.addScope('email');
+googleProvider.addScope("email");
 
 // Add email scope to Microsoft provider
-microsoftProvider.addScope('email');
+microsoftProvider.addScope("email");
 
 const auth = getAuth(app);
 
@@ -55,36 +56,47 @@ function Login() {
 
   const handleAuthSuccess = async (user) => {
     try {
-      // Get user email, throw error if not available
-      const userEmail = user.email;
-      if (!userEmail) {
-        throw new Error("User email is required. Please use an authentication method that provides email access.");
+      console.log("Auth user data:", user); // Debug log
+
+      // Get user email, ensure it exists
+      let userEmail = user.email;
+
+      // Handle Twitter case where email might not be available
+      if (!userEmail && user.providerData && user.providerData[0]) {
+        if (user.providerData[0].providerId === "twitter.com") {
+          userEmail = `${user.providerData[0].uid}@twitter.user`;
+          console.log("Created Twitter email:", userEmail);
+          
+      await createOrFetchUserDocument(userEmail);
+        }
       }
-      
-      // Create or fetch user document with verified email
-      await createOrFetchUserDocument({
-        uid: user.uid,
-        email: userEmail,
-        displayName: user.displayName,
-        photoURL: user.photoURL
-      });
-      
+
+      if (!userEmail) {
+        throw new Error("No email available from authentication provider");
+      }
+
+      // Create or fetch user document
+      await createOrFetchUserDocument(userEmail);
+      console.log("User document created/fetched for:", userEmail);
+
       // Store user data in Redux
       const username = user.displayName || userEmail.split("@")[0];
       const avatar = user.photoURL || "/default-avatar.png";
-      
-      dispatch(setUser({
-        email: userEmail,
-        uid: user.uid,
-        username: username,
-        avatar: avatar
-      }));
-      
+
+      dispatch(
+        setUser({
+          email: userEmail,
+          uid: user.uid,
+          username: username,
+          avatar: avatar,
+        })
+      );
+
       // Navigate to dashboard
       dispatch(setFromHeroPage(false));
       navigate("/Dashboard");
     } catch (error) {
-      console.error("Error setting up user:", error);
+      console.error("Error in handleAuthSuccess:", error);
       setError("Failed to set up user account: " + error.message);
     }
   };
@@ -92,7 +104,7 @@ function Login() {
   const loginUser = (e) => {
     e.preventDefault();
     setError("");
-    
+
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
         handleAuthSuccess(result.user);
@@ -112,30 +124,30 @@ function Login() {
 
   const handleSignIn = (provider, providerName) => {
     setError("");
-    
+
     signInWithPopup(auth, provider)
-      .then((result) => {
+      .then(async (result) => {
         const user = result.user;
-        
-        // For Twitter specifically, check if email was received
-        if (providerName === "Twitter" && !user.email) {
-          throw new Error("Email access was not granted by Twitter. Please try another sign-in method.");
-        }
-        
-        handleAuthSuccess(user);
+        console.log(`${providerName} auth result:`, user); // Debug log
+        await handleAuthSuccess(user);
       })
       .catch((error) => {
+        console.error("Auth error:", error);
         if (error.code === "auth/account-exists-with-different-credential") {
-          setError(`Account exists with a different credential for ${providerName}`);
+          setError(
+            `An account already exists with the same email address but different sign-in credentials. Try signing in using a different method.`
+          );
+        } else if (error.code === "auth/popup-closed-by-user") {
+          setError("Sign-in was cancelled by user");
         } else {
           setError(`${providerName} sign-in failed: ${error.message}`);
         }
-        console.error(`${providerName} sign-in failed:`, error.message);
       });
   };
 
   const googleLoginHandler = () => handleSignIn(googleProvider, "Google");
-  const signinwithMicrosoft = () => handleSignIn(microsoftProvider, "Microsoft");
+  const signinwithMicrosoft = () =>
+    handleSignIn(microsoftProvider, "Microsoft");
   const signinwithTwitter = () => handleSignIn(twitterProvider, "Twitter");
 
   return (
@@ -173,13 +185,13 @@ function Login() {
           <h2 className="text-3xl font-bold text-[#152d80] mb-4">
             Sign In to Your Account
           </h2>
-          
+
           {error && (
             <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
               {error}
             </div>
           )}
-          
+
           <form className="space-y-4" onSubmit={loginUser}>
             <div>
               <label className="block text-gray-700 font-semibold mb-1">

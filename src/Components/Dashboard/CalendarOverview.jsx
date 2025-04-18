@@ -83,6 +83,26 @@ export default function CalendarOverview() {
     return <div className="text-center py-6 text-gray-500">Loading...</div>;
   }
 
+  if (projects.length === 0) {
+    return (
+      <div className="w-full max-w-[500px] mx-auto p-4 md:p-8 bg-white rounded-lg shadow-lg">
+        <h2 className="text-xl md:text-2xl font-semibold mb-4">
+          This Week's Overview
+        </h2>
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4">🎉</div>
+          <h3 className="text-2xl font-medium text-green-600 mb-2">Hurray!</h3>
+          <p className="text-gray-600">
+            You have no upcoming projects this week.
+          </p>
+          <p className="text-gray-400 text-sm mt-2">
+            Time to relax or plan ahead!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-[500px] mx-auto p-4 md:p-8 bg-white rounded-lg shadow-lg">
       <h2 className="text-xl md:text-2xl font-semibold mb-4">
@@ -164,7 +184,7 @@ export default function CalendarOverview() {
                   <CardTitle className="text-xl font-semibold group-hover:text-gray-900">
                     {project.title}
                   </CardTitle>
-                  
+
                   <div className="flex justify-center my-2">
                     <Badge
                       variant={project.completed ? "success" : "destructive"}
@@ -182,7 +202,7 @@ export default function CalendarOverview() {
                       <span>{project.completed ? "Completed" : "Pending"}</span>
                     </Badge>
                   </div>
-                  
+
                   <p className="text-sm text-gray-500 leading-relaxed max-w-2xl">
                     {project.description}
                   </p>
