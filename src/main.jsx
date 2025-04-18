@@ -24,14 +24,14 @@ import CreateProject from "./Components/CreateProject/CreateProject.jsx";
 import Features from "./Components/Header/Navbar/Features/Features.jsx";
 import AboutUs from "./Components/Header/Navbar/AboutUs/AboutUs.jsx";
 import ContactUs from "./Components/Header/Navbar/ContactUs/ContactUs.jsx";
-import SignUp from "./Components/SignUp/Signup.jsx";
+import SignUp from "./Components/SignUp/SignUp.jsx";
 import SignIn from "./Components/SignIn/SignIn.jsx";
 import Dashboard from "./Pages/Dashboard.jsx";
-import EditProfile from "./Components/EditProfile/EditProfile.jsx";
+
 import Logout from "./Components/Logout/Logout.jsx"; // Import the React component, not the function
 import MyProjects from "./Components/MyProjects/MyProjects.jsx";
 import TrashBin from "./Components/TrashBin/TrashBin.jsx";
-import MyProjectsnew from "./Pages/MyProjectsnew.jsx";
+
 import SuccessProject from "./Components/SuccessProject/SuccessProject.jsx";
 import TOS from "./Components/TOS & Privacy/TOS.jsx";
 import Privacy from "./Components/TOS & Privacy/Privacy.jsx";

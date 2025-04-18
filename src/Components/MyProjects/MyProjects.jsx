@@ -41,7 +41,7 @@ export default function MyProjects() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setisauthenticated(true);
-        setUserEmail(`${user.providerData[0].uid}@gmail.com`);
+        setUserEmail(user.email || `${user.providerData[0].uid}@gmail.com`);
       } else {
         setisauthenticated(false);
         navigate("/SignIn");
@@ -470,12 +470,16 @@ export default function MyProjects() {
                 type="number"
                 className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
                 value={editProject.completion}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const value = Math.max(
+                    0,
+                    Math.min(100, Number(e.target.value))
+                  );
                   setEditProject((prev) => ({
                     ...prev,
-                    completion: e.target.value, // Allow only numeric input
-                  }))
-                }
+                    completion: value,
+                  }));
+                }}
                 placeholder="Completion Percentage"
               />
               <input

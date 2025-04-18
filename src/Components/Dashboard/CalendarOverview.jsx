@@ -45,7 +45,7 @@ export default function CalendarOverview() {
     const auth = getAuth(app);
     const user = auth.currentUser;
     if (user) {
-      setUserEmail(`${user.providerData[0].uid}@gmail.com`);
+      setUserEmail(user.email || `${user.providerData[0].uid}@gmail.com`);
     }
   }, []);
 

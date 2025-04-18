@@ -17,7 +17,7 @@ export const useUserEmail = () => {
     if (user) {
       // Get email directly from user if available
       if (`${user.providerData[0].uid}@gmail.com`) {
-        setUserEmail(`${user.providerData[0].uid}@gmail.com`);
+        setUserEmail(user.email || `${user.providerData[0].uid}@gmail.com`);
       }
       // If no direct email but provider data is available (Twitter case)
       else if (user.providerData && user.providerData[0]) {
