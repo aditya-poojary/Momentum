@@ -54,30 +54,32 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-6 space-y-12">
+    <div className="w-full min-w-[320px] max-w-6xl mx-auto py-8 px-4 sm:px-6 space-y-8 overflow-x-hidden">
       {/* Contact Info Card */}
       <Card className="shadow-lg border border-gray-300 bg-gradient-to-br from-blue-100 to-white">
-        <CardHeader className="text-center">
-          <h2 className="text-3xl font-bold text-blue-600 mb-4">Contact Info</h2>
-          <p className="text-gray-600 ">
+        <CardHeader className="text-center p-4 sm:p-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2 sm:mb-4">
+            Contact Info
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base">
             Reach out to us directly through the contact details below.
           </p>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
                 📞
               </div>
-              <p className="text-lg font-semibold text-gray-700">
+              <p className="text-base sm:text-lg font-semibold text-gray-700">
                 +91 91520 04851
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
                 📧
               </div>
-              <p className="text-lg font-semibold text-gray-700">
+              <p className="text-base sm:text-lg font-semibold text-gray-700 break-all sm:break-normal">
                 adityapoojary07@gmail.com
               </p>
             </div>
@@ -86,15 +88,17 @@ export default function ContactForm() {
       </Card>
 
       {/* Contact Form */}
-      
-        <CardHeader className="text-center">
-          <h2 className="text-4xl font-bold text-blue-600 mb-2">Contact Us</h2>
-          <p className="text-gray-600 pt-10">
-            We'd love to hear from you! Fill out the form below and we’ll get
+      <Card className="shadow-lg border border-gray-300">
+        <CardHeader className="text-center p-4 sm:p-6">
+          <h2 className="text-2xl sm:text-4xl font-bold text-blue-600 mb-2">
+            Contact Us
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base pt-4 sm:pt-10">
+            We'd love to hear from you! Fill out the form below and we'll get
             back to you shortly.
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Input
@@ -154,7 +158,7 @@ export default function ContactForm() {
             </div>
           </form>
         </CardContent>
-      
+      </Card>
 
       {/* Dialog for Success/Error */}
       {dialog.isOpen && (

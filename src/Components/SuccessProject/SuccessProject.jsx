@@ -59,7 +59,7 @@ export default function SuccessProject() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-white rounded-lg shadow-lg min-h-screen overflow-y-auto pb-20">
+    <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-white rounded-lg shadow-lg h-screen">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         🎉 Successful Projects
       </h1>
@@ -69,17 +69,17 @@ export default function SuccessProject() {
           <p className="text-lg text-gray-500">No successful projects yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {successProjects.map((project) => (
             <Card key={project.id} className="hover:shadow-lg transition duration-200">
               <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-800 break-words">
+                <CardTitle className="text-xl font-semibold text-gray-800">
                   {project.projectName || "Untitled Project"}
                 </CardTitle>
-                <CardDescription className="text-gray-600 break-words">
-                {project.description && project.description.length > 50
-                  ? project.description.substring(0, 50) + "..."
-                  : project.description || "No description"}
+                <CardDescription className="text-gray-600">
+                {project.description.length > 50
+                            ? project.description.substring(0, 50) + "..."
+                            : project.description}
                 </CardDescription>
               </CardHeader>
               <CardContent>
