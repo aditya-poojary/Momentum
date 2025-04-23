@@ -14,6 +14,7 @@ import {
 import { db, app } from "../../firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Button } from "../ui/button";
+import { Slider } from "../ui/slider";
 import { useNavigate } from "react-router-dom";
 
 export default function MyProjects() {
@@ -467,22 +468,6 @@ export default function MyProjects() {
                 placeholder="Description"
               />
               <input
-                type="number"
-                className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
-                value={editProject.completion}
-                onChange={(e) => {
-                  const value = Math.max(
-                    0,
-                    Math.min(100, Number(e.target.value))
-                  );
-                  setEditProject((prev) => ({
-                    ...prev,
-                    completion: value,
-                  }));
-                }}
-                placeholder="Completion Percentage"
-              />
-              <input
                 type="date"
                 className="border p-2 rounded focus:ring-2 focus:ring-blue-400"
                 value={editProject.deadline}
@@ -507,6 +492,26 @@ export default function MyProjects() {
                 placeholder="Start Time"
               />
             </div>
+                  <div>
+                    <label className="block text-gray-700 font-semibold mb-2 pt-5">
+                      Completion (%): <span className="text-blue-500 font-medium ml-1">{editProject.completion}%</span>
+                    </label>
+                    <div className="">
+                      <Slider 
+                        defaultValue={[0]} 
+                        value={[editProject.completion]} 
+                        max={100} 
+                        step={1} 
+                        onValueChange={(value) =>
+                          setEditProject((prev) => ({
+                            ...prev,
+                            completion: value[0],
+                          }))
+                        }
+                        className="py-2"
+                      />
+                    </div>
+                  </div>
             <div className="mt-4 flex gap-2">
               <button
                 onClick={handleUpdateProject}

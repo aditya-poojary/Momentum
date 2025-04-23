@@ -5,6 +5,7 @@ import { addProjectToUserCollection } from "../../Firestore/UserDocument";
 import { useNavigate } from "react-router-dom";
 import DialogBox from "./DialogBox/DialogBox";
 import { useUserEmail } from "../../hooks/useUserEmail";
+import { Slider } from "@/components/ui/slider";
 
 const db = getDatabase(app);
 function CreateProject() {
@@ -141,24 +142,21 @@ function CreateProject() {
           {/* Completion */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
-              Completion (%):
+              Completion (%):{" "}
+              <span className="text-blue-500 font-medium ml-1">
+                {completion}%
+              </span>
             </label>
-            <input
-              type="number"
-              value={completion}
-              onChange={(e) => {
-                const value = Math.max(
-                  0,
-                  Math.min(100, Number(e.target.value))
-                );
-                setCompletion(value);
-              }}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              placeholder="0-100"
-              min="0"
-              max="100"
-              required
-            />
+            <div className="py-4">
+              <Slider
+                defaultValue={[0]}
+                value={[completion]}
+                max={100}
+                step={1}
+                onValueChange={(value) => setCompletion(value[0])}
+                className="py-2"
+              />
+            </div>
           </div>
 
           {/* Submit Button */}

@@ -12,6 +12,7 @@ import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/userSlice";
+import { createOrFetchUserDocument } from "../../Firestore/UserDocument"; // Add this import
 
 const googleProvider = new GoogleAuthProvider();
 const microsoftProvider = new OAuthProvider("microsoft.com"); // Define Microsoft provider
@@ -275,16 +276,6 @@ function SignUp() {
               </svg>
             </button>
           </div>
-          {currentUser && (
-            <div className="flex items-center mt-4">
-              <img
-                src={currentUser.photoURL}
-                alt="User Avatar"
-                className="w-10 h-10 rounded-full mr-2"
-              />
-              <p>{currentUser.displayName}</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
